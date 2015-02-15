@@ -1,0 +1,7 @@
+_build/dev/lib/ws_elixir/ebin/Elixir.WebSocketHandler.beam	Elixir.WebSocketHandler	lib/ws_handler.ex	Elixir.Kernel	Elixir.List	Elixir.Module	Elixir.Record	cowboy_bstr	cowboy_req	erlang	Elixir
+_build/dev/lib/ws_elixir/ebin/Elixir.WebSocketSup.beam	Elixir.WebSocketSup	lib/ws_server_sup.ex	Elixir.Module	supervisor	Elixir
+_build/dev/lib/ws_elixir/ebin/Elixir.DumbIncrementHandler.beam	Elixir.DumbIncrementHandler	lib/dumb_handler.ex	Elixir.Kernel	Elixir.Record	Elixir.String.Chars	erlang	timer	Elixir
+_build/dev/lib/ws_elixir/ebin/Elixir.MirrorHandler.beam	Elixir.MirrorHandler	lib/mirror_handler.ex	gproc	Elixir
+_build/dev/lib/ws_elixir/ebin/Elixir.FileHandler.beam	Elixir.FileHandler	lib/file_handler.ex	Elixir.File	Elixir.Module	cowboy_req	Elixir
+_build/dev/lib/ws_elixir/ebin/Elixir.HelloHandler.beam	Elixir.HelloHandler	lib/hello_handler.ex	Elixir.Module	cowboy_req	Elixir
+_build/dev/lib/ws_elixir/ebin/Elixir.WebSocketServer.beam	Elixir.WebSocketServer	lib/ws_server.ex	Elixir.DumbIncrementHandler	Elixir.FileHandler	Elixir.HelloHandler	Elixir.IO	Elixir.MirrorHandler	Elixir.Module	Elixir.WebSocketHandler	Elixir.WebSocketSup	cowboy	cowboy_router	Elixir
