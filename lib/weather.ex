@@ -21,8 +21,8 @@ defmodule Weather do
   A weather model record
   """
   Record.defrecord :weather_model, WeatherModel, [
-    code: "", 
-    state: ~s({"rainfall": 0.0, "snowfall": 0.0, "average_temperature": 0.0, "low_temperature": 0.0, "high_temperature": 0.0}) 
+    code: <<"">>, 
+    state: <<"{\"rainfall\": 0.0, \"snowfall\": 0.0, \"average_temperature\": 0.0, \"low_temperature\": 0.0, \"high_temperature\": 0.0}">> 
   ]
 
 
@@ -34,10 +34,16 @@ defmodule Weather do
   def start_link(model) do
     code = weather_model(model, :code)
     state = weather_model(model, :state)
-      |> Poison.Parser.parse!
     Agent.start_link(fn -> {:weather_model, code, state} end)
   end
 
+  @doc """
+    Returns the current state of `weather` as JSON
+  """
+  def to_json(weather) do
+    {:weather_model, _code, state} = Agent.get(weather, fn s -> s end)
+    state
+  end
 
   @doc """
     Changes the update code of `weather` to the supplied `code`
@@ -54,7 +60,7 @@ defmodule Weather do
     {:weather_model, code, state} = Agent.get(weather, fn s -> s end)
     
     # Convert weather state to a Javascript object
-    js = "var weather = " <>  to_string Poison.Encoder.encode(state, [])
+    js = "var weather = " <>  state #to_string Poison.Encoder.encode(state, [])
     
     # Load the Weather Model's Javascript API
     js = js <> """
@@ -78,7 +84,7 @@ defmodule Weather do
     js = js <> ";\nweather"
 
     # Update the `weather` state by running the Javascript code
-    new_state = Execjs.eval(js)
+    new_state = Execjs.eval(js) |> Poison.encode! |> to_string
     Agent.update(weather, fn _ -> {:weather_model, code, new_state} end)
 
   end

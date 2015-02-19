@@ -70,7 +70,7 @@ class Gen_uncompressed(threading.Thread):
     self.search_paths = search_paths
 
   def run(self):
-    target_filename = 'www/blockly_uncompressed.js'
+    target_filename = 'priv/js/blockly_uncompressed.js'
     f = open(target_filename, 'w')
     f.write(HEADER)
     f.write("""
@@ -155,7 +155,7 @@ class Gen_compressed(threading.Thread):
     self.gen_generator('dart')
 
   def gen_core(self):
-    target_filename = 'www/blockly_compressed.js'
+    target_filename = 'priv/js/blockly_compressed.js'
     # Define the parameters for the POST request.
     params = [
         ('compilation_level', 'SIMPLE_OPTIMIZATIONS'),
@@ -181,7 +181,7 @@ class Gen_compressed(threading.Thread):
     self.do_compile(params, target_filename, filenames, '')
 
   def gen_blocks(self):
-    target_filename = 'www/blocks_compressed.js'
+    target_filename = 'priv/js/blocks_compressed.js'
     # Define the parameters for the POST request.
     params = [
         ('compilation_level', 'SIMPLE_OPTIMIZATIONS'),
@@ -206,7 +206,7 @@ class Gen_compressed(threading.Thread):
     self.do_compile(params, target_filename, filenames, remove)
 
   def gen_generator(self, language):
-    target_filename = 'www/' + language + '_compressed.js'
+    target_filename = 'priv/js/' + language + '_compressed.js'
     # Define the parameters for the POST request.
     params = [
         ('compilation_level', 'SIMPLE_OPTIMIZATIONS'),

@@ -25,6 +25,10 @@ defmodule WebSocketHandler do
         {"sec-websocket-protocol", "plant-editor-protocol"} ->
           {_, handler} = List.keyfind opts, :plant_editor_protocol, 0
           handler
+
+        {"sec-websocket-protocol", "weather-protocol"} ->
+          {_, handler} = List.keyfind opts, :weather_protocol, 0
+          handler
       end
 
     # Init selected handler

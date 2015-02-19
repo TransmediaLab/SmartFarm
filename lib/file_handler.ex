@@ -10,7 +10,7 @@ defmodule FileHandler do
   end
 
   def handle(req, state) do
-    {:ok, html_data} = File.read("www/test.html")
+    {:ok, html_data} = File.read("priv/test.html")
     {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], html_data, req
     {:ok, req, state}
   end

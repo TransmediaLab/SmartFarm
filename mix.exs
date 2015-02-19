@@ -1,4 +1,4 @@
-defmodule WsElixir.Mixfile do
+defmodule SmartFarm.Mixfile do
   use Mix.Project
 
   def project do
@@ -14,7 +14,7 @@ defmodule WsElixir.Mixfile do
   def application do
     [
       applications: [:ranch, :crypto, :cowboy, :gproc],
-      mod: {WebSocketServer, []},
+      mod: {SmartfarmServer, []},
     ]
   end
 
