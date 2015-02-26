@@ -1,0 +1,36 @@
+<div id="signup-dialog" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Create an Account</h4>
+      </div>
+      <div class="modal-body">
+        <div id="signup-message">
+        </div>
+        <div class="form-group">
+          <label for="signup-username">Username</label>
+          <input id="signup-username" type="text" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input id="signup-password" type="password" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="signup-password-confirmation">Password Confirmation</label>
+          <input id="signup-password-confirmation" type="password" class="form-control" />
+        </div>
+        <div class="checkbox">
+          <label for="signup-teacher">
+            <input id="signup-teacher" type="checkbox" />
+            I am a teacher
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="signup-button" type="button" class="btn btn-default">Sign Up</button>
+      </div>
+    </div>
+  </div>
+</div>

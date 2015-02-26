@@ -1,0 +1,54 @@
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+
+    <!-- Brand and toggle button -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="nav">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">SmartFarm</a>
+    </div>
+
+    <!-- Navigation links -->
+    <div class="collapase navbar-collapse" id="nav">
+      <ul class="nav navbar-nav">
+        
+        <%= if controller == :simulations do %>
+          <li class="active"><a href="/simulations">Simulations</a></li>
+        <% else %>
+          <li><a href="/simulations">Simulations</a></li>
+        <% end %>
+        
+        <%= if controller == :weather do %>
+          <li class="active"><a href="/weather">Weather Models</a></li>
+        <% else %>
+          <li><a href="/weather">Weather Models</a></li>
+        <% end %>
+
+        <%= if controller == :crops do %>
+          <li class="active"><a href="/plants">Plant Models</a></li>
+        <% else %>
+          <li><a href="/crops">Plant Models</a></li>
+        <% end %>
+
+      </ul>
+
+      <p class="navbar-text navbar-right">
+        <span class="logged-out">
+          <a class="navbar-link login-link" href="/login">Sign In</a>
+          or
+          <a class="signup-link" href="/signup">Sign Up</a>
+        </span>
+        <span class="logged-in">
+          <span id="logged-in-message"></span>
+          <a class="navbar-link logout-link" href="/logout">Sign Out</a>
+        </span>
+      </p>
+       
+    </div>
+
+  </div>
+</nav>

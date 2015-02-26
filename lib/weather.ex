@@ -25,6 +25,14 @@ defmodule Weather do
     state: <<"{\"rainfall\": 0.0, \"snowfall\": 0.0, \"average_temperature\": 0.0, \"low_temperature\": 0.0, \"high_temperature\": 0.0}">> 
   ]
 
+  @doc """
+  Loads a weather model from the database
+  """
+  def load(id) do
+    state = <<"{\"rainfall\": 0.0, \"snowfall\": 0.0, \"average_temperature\": 0.0, \"low_temperature\": 0.0, \"high_temperature\": 0.0}">>
+    {_id, code, _workspace} = Database.weather_model id
+    Agent.start_link(fn -> {:weather_model, code, state} end)
+  end
 
   @doc """
   Starts a new weather process.

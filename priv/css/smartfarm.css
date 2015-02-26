@@ -20,3 +20,8 @@
   font-size: 4em;
   padding: 0 15px;
 }
+
+.weather > a {
+  font-size: 14pt;
+  color: green;
+}

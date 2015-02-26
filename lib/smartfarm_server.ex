@@ -9,6 +9,10 @@ defmodule SmartfarmServer do
         {'/css/[...]', :cowboy_static, {:priv_dir, :smartfarm, <<"css">>}},
         {'/js/[...]', :cowboy_static, {:priv_dir, :smartfarm, <<"js">>}},
         {'/ws',  FileHandler, []},
+        {'/login', LoginHandler, []},
+        {'/logout', LogoutHandler, []},
+        {'/signup', SignupHandler, []},
+        {'/weather[/:id]', WeatheryHandler, []},
         {'/_ws', WebSocketHandler, [{:dumb_protocol,   DumbIncrementHandler},
                                     {:mirror_protocol, MirrorHandler},
                                     {:weather_protocol, WeatherHandler},
@@ -18,6 +22,8 @@ defmodule SmartfarmServer do
     ])
     :cowboy.start_http :my_http_listener, 100, [{:port, 80}], [{:env, [{:dispatch, dispatch}]}]
     IO.puts "Started listening on port 80..."
+
+    Database.init
 
     WebSocketSup.start_link
   end

@@ -3,44 +3,73 @@ defmodule WeatherHandler do
   IO.puts "Weather"
 
   require Record
-  Record.defrecordp :state, paused: :true, clock: 0, weather: 0
-
   require Weather
 
+  @doc """
+  A record for the weather simulation state
+  """
+  Record.defrecordp :state, paused: :true, clock: 0, weather: 0
+
+  @doc """
+  A record for a weather simulation command
+  """
+  Record.defrecordp :command, type: :noop, data: 0
+
+
+  @doc """
+  Initializes the weather websocket server
+  """
   def init(_any, req) do
     IO.puts("init")
-    {:ok, weather} = Weather.start_link(Weather.weather_model())
+    {:ok, weather} = Weather.load 1 #start_link(Weather.weather_model(Database.weather_model(1)))
     :erlang.send(self(), :time)
     {:ok, req, state(paused: :true, clock: 1423980000000, weather: weather)}
   end
 
-  def stream("reset\n", req, state) do
-    IO.puts("reset")
-    clock = 1423980000000
-    :erlang.send(self(), :time)
-    {:ok, req, state(state, paused: :true, clock: clock)}
-  end
 
-  def stream("pause\n", req, state) do
-    IO.puts("pause")
-    {:ok, req, state(state, paused: :true)}
-  end
-
-  def stream("resume\n", req, state) do
-    IO.puts("resume")
-    :erlang.send_after(50, self(), :tick)
-    {:ok, req, state(state, paused: :false)}
-  end
-
-  def stream("step\n", req, state = state(clock: clock, weather: weather)) do
-    IO.puts("step")
-    IO.puts( inspect( state ))
-    clock = clock + 86400000
-    :erlang.send(self(), :time)
-    Weather.tick(weather)
-    IO.puts inspect( weather)
-    :erlang.send(self(), :weather)
-    {:ok, req, state(state, clock: clock, weather: weather, paused: :true)}
+  @doc """
+  Processes messages from the websocket client
+  """
+  def stream(json, req, state(clock: clock, weather: weather)) do
+    msg = Poison.decode! json
+    data = msg["data"]
+    case msg["type"] do
+      "load-weather" ->
+        IO.puts("load weather")
+        IO.puts( inspect msg["data"]["id"] )
+        Process.exit(weather, :normal)
+        {:ok, new_weather} = Weather.load msg["data"]["id"]
+        {:ok, req, state(state, paused: true, clock: clock, weather: weather)}
+      "run" ->
+        IO.puts("resume")
+        :erlang.send_after(50, self(), :tick)
+        {:ok, req, state(state, paused: :false, clock: clock, weather: weather)}
+      "pause" ->
+        IO.puts("pause")
+        {:ok, req, state(state, paused: :true, clock: clock, weather: weather)}
+      "reset" ->
+        IO.puts "reset"
+        clock = 1423980000000
+        :erlang.send(self(), :time)
+        {:ok, req, state(state, paused: :true, clock: clock, weather: weather)}
+      "step" ->
+        IO.puts("step")
+        IO.puts( inspect( state ))
+        clock = clock + 86400000
+        :erlang.send(self(), :time)
+        Weather.tick(weather)
+        IO.puts inspect( weather)
+        :erlang.send(self(), :weather)
+        {:ok, req, state(state, paused: true, clock: clock, weather: weather)}
+      "update" ->
+        IO.puts("update")
+        IO.puts inspect(data) 
+        Weather.change_code(weather, data["code"])
+        Database.update_weather_model(1, data["workspace"])
+        {:ok, req, state(state, paused: true, clock: clock, weather: weather)}
+      _ ->
+        {:ok, req, state(state, clock: clock, weather: weather)}
+    end
   end
 
 
