@@ -32,13 +32,13 @@
  * snowfall 			mm
  * solar_radiation 		J/m*m
  * day_length 			?
- * average_temperature 	degrees C
+ * average_temperature 		degrees C
  * low_temperature 		degrees C
- * high_temperature 	degrees C
+ * high_temperature 		degrees C
  * wind_speed m/s
  * wind_direction  		compass degrees
  * dew_point 			degrees C
- * relative_humidity 	% saturation
+ * relative_humidity 		% saturation
  */
 'use strict';
 

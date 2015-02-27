@@ -4,6 +4,7 @@ defmodule Weather do
     within a SmartFarm simulation.
   """
 
+  require EEx
   require Record
   require Execjs
 
@@ -57,21 +58,7 @@ defmodule Weather do
     js = "var weather = " <>  state #to_string Poison.Encoder.encode(state, [])
     
     # Load the Weather Model's Javascript API
-    js = js <> """
- 
-      function set_rainfall(value){ weather.rainfall = value;}
-      function set_snowfall(value){ weather.snowfall = value; }
-      function set_average_temperature(value){ weather.average_temperature = value}
-      function set_low_temperature(value){ weather.low_temperature = value;}
-      function set_high_temperature(value) { weather.high_temperature = value;}
-
-      function get_rainfall(){ return weather.rainfall; }
-      function get_snowfall(){ return weather.snowfall; }
-      function get_average_temperature(){ return weather.average_temperature; }
-      function get_low_temperature(){ return weather.low_temperature; }
-      function get_high_temperature(){ return weather.high_temperature; }
-
-    """
+    js = js <> javascript_api()
 
     # Apply the Javascript Weather update functionality
     js = js <> code 
@@ -82,5 +69,42 @@ defmodule Weather do
     Agent.update(weather, fn s -> model(s, state: new_state)  end)
 
   end
+
+  # JavaScript API
+  @api """
+
+  function set_rainfall(value){weather.rainfall=value;}
+  function set_snowfall(value){weather.snowfall=value;}
+  function set_solar_radiation(value){weather.solar_radiation=value;}
+  function set_day_length(value){weather.day_length=value;}
+  function set_average_temperature(value){weather.average_temperature=value}
+  function set_low_temperature(value){weather.low_temperature=value;}
+  function set_high_temperature(value){weather.high_temperature=value;}
+  function set_wind_speed(value){weather.wind_speed=value;}
+  function set_wind_direction(value){weather.wind_direction=value;}
+  function set_dew_point(value){weather.dew_point=value;}
+  function set_relative_humidity(value){weather.relative_humidity=value;}
+
+  function get_rainfall(){return weather.rainfall;}
+  function get_snowfall(){return weather.snowfall;}
+  function get_solar_radiation(){return weather.solar_radiation;}
+  function get_day_length(){return weather.day_length;}
+  function get_average_temperature(){return weather.average_temperature;}
+  function get_low_temperature(){return weather.low_temperature;}
+  function get_high_temperature(){return weather.high_temperature;}
+  function get_wind_speed(){return weather.wind_speed;}
+  function get_wind_direction(){return weather.wind_direction;}
+  function get_dew_point(){return weather.dew_point;}
+  function get_relative_humidity(){return weather.relative_humidity;}
+
+  """
+
+  @doc """
+    Returns the Weather JavaScript API as a string
+  """
+  def javascript_api() do
+    @api
+  end
+
 
 end

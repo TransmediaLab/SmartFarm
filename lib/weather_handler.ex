@@ -46,7 +46,7 @@ defmodule WeatherHandler do
   end
 
   defp serve(id, req) do
-    {id, code, workspace} = Database.weather_model(id)
+    {id, _code, workspace} = Database.weather_model(id)
     head = Layout.head("Weather Model Editor", [:blockly, :controls])
     nav = Layout.nav(:weather)
     content = weather_edit(id, workspace)
