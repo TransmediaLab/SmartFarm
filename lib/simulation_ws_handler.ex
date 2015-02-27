@@ -29,7 +29,7 @@ defmodule SimulationWebSocketHandler do
   @doc"""
   Initialize the websocket server and set up the inital simulation state
   """
-  def websocket_init(_any, req, opts) do
+  def websocket_init(_any, req, _opts) do
 
     # Set the simulation start time to right now
     {mega, sec, _micro} = :erlang.now
@@ -41,7 +41,21 @@ defmodule SimulationWebSocketHandler do
     format_ok req, state(start: start, time: start)
   end
 
-  # Dispatch generic message to the handler
+
+  @doc """ 
+    Handles websocket messages.  These should be JSON strings in the form
+    {type: <type>, data: <data>} from:
+
+    type 		| data
+    ====================|======
+    run  		| none
+    pause		| none
+    reset		|
+    step 		| none
+    load-weather  	| id : <database id of the weather>
+    update-weather	| workspace : <Blockly workspace as xml string>, code: <JavaScript code equivalent>
+
+  """  
   def websocket_handle({:text, msg}, req, state) do
     json = Poison.decode! msg
     case json["type"] do
@@ -89,12 +103,11 @@ defmodule SimulationWebSocketHandler do
     format_ok req, state
   end
 
-  # Various service messages
 
   @doc """
-  Advances the simulation by one step, triggering advances for all models currently
-  defined in the simulation.  It also schedules the next simulation step unless
-  the simulation is currently paused, and sends the client an updated time.
+    Advances the simulation by one step, triggering advances for all models currently
+    defined in the simulation.  It also schedules the next simulation step unless
+    the simulation is currently paused, and sends the client an updated time.
   """
   def websocket_info(:step, req, state(time: time, paused: paused)=state) do
 
@@ -113,7 +126,7 @@ defmodule SimulationWebSocketHandler do
   end
 
   @doc """
-  Advances the weather simulation and sends the updated weather state to the client
+    Advances the weather simulation and sends the updated weather state to the client
   """
   def websocket_info(:weather, req, state(weather: weather)=state) do
     Weather.tick(weather)
@@ -122,7 +135,8 @@ defmodule SimulationWebSocketHandler do
     format_reply req, reply, state(state, weather: weather)
   end
 
-  def websocket_info(info, req, state) do
+  
+  def websocket_info(_info, req, state) do
     format_ok req, state
   end
 

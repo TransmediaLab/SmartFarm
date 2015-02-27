@@ -12,13 +12,8 @@ defmodule SmartfarmServer do
         {'/login', LoginHandler, []},
         {'/logout', LogoutHandler, []},
         {'/signup', SignupHandler, []},
-        {'/weather[/:id]', WeatheryHandler, []},
+        {'/weather[/:id]', WeatherHandler, []},
         {'/simulation_ws', SimulationWebSocketHandler, []},
-        {'/_ws', WebSocketHandler, [{:dumb_protocol,   DumbIncrementHandler},
-                                    {:mirror_protocol, MirrorHandler},
-                                    {:weather_protocol, WeatherHandler},
-                                    {:simulation_protocol, SimulationInstanceHandler},
-                                    {:plant_protocol, PlantHandler}]},
         {'/',    HelloHandler, []}
       ]}
     ])
