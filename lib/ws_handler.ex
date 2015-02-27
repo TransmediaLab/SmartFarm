@@ -29,6 +29,10 @@ defmodule WebSocketHandler do
         {"sec-websocket-protocol", "weather-protocol"} ->
           {_, handler} = List.keyfind opts, :weather_protocol, 0
           handler
+
+        {"sec-websocket-protocol", "simulation-protocol"} ->
+          {_, handler} = List.keyfind opts, :simulation_protocol, 0
+          handler
       end
 
     # Init selected handler

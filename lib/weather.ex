@@ -1,71 +1,57 @@
 defmodule Weather do
   @moduledoc """
-  Defines methods for interacting with a model for simulating weather 
-  consisting of a state and update code.
-
-  The state consists of the following variables:
-
-  rainfall		in mm
-  snowfall		in mm 
-  average_temperature	in degrees C
-  low_temperature		in degrees C
-  high_temperature	in degrees C
-
-  And the code is a snippet of Javascript, using the SmartFarm
-  Javascript Weather API.
+    Defines methods for interacting with an agent for modeling weather
+    within a SmartFarm simulation.
   """
+
   require Record
   require Execjs
 
-  @doc """
-  A weather model record
-  """
-  Record.defrecord :weather_model, WeatherModel, [
-    code: <<"">>, 
-    state: <<"{\"rainfall\": 0.0, \"snowfall\": 0.0, \"average_temperature\": 0.0, \"low_temperature\": 0.0, \"high_temperature\": 0.0}">> 
-  ]
+  # A record for the weather agent model
+  Record.defrecordp :model, id: nil, workspace: <<"">>, code: <<"">>, state: <<"">>
 
   @doc """
-  Loads a weather model from the database
+    Loads a weather model from the database and returns a weather agent
   """
   def load(id) do
-    state = <<"{\"rainfall\": 0.0, \"snowfall\": 0.0, \"average_temperature\": 0.0, \"low_temperature\": 0.0, \"high_temperature\": 0.0}">>
-    {_id, code, _workspace} = Database.weather_model id
-    Agent.start_link(fn -> {:weather_model, code, state} end)
+    result = Postgrex.Connection.query!(:conn, "SELECT code, workspace FROM weather_model WHERE id = " <> to_string(id), []) 
+    [{code, workspace} | _tail]  = result.rows
+    state = <<"{}">>
+    {:ok, agent} = Agent.start_link(fn -> model(id: id, workspace: workspace, code: code, state: state) end)
+    agent
   end
 
   @doc """
-  Starts a new weather process.
-  -- need to add variables & support for
-  -- custom code
+    Returns the current state of the weather model as a JSON string
   """
-  def start_link(model) do
-    code = weather_model(model, :code)
-    state = weather_model(model, :state)
-    Agent.start_link(fn -> {:weather_model, code, state} end)
-  end
-
-  @doc """
-    Returns the current state of `weather` as JSON
-  """
-  def to_json(weather) do
-    {:weather_model, _code, state} = Agent.get(weather, fn s -> s end)
+  def state(weather) do
+    model(state: state) = Agent.get(weather, fn s -> s end)
     state
   end
 
   @doc """
-    Changes the update code of `weather` to the supplied `code`
+    Returns the current workspace as an XML string
   """
-  def change_code(weather, code) do
-    Agent.update(weather, fn {:weather_model, _old_code, state} -> {:weather_model, code, state} end)
+  def workspace(weather) do
+    model(workspace: workspace) = Agent.get(weather, fn s -> s end)
+    workspace |> String.replace "\"", "\\\""
+  end
+
+  @doc """
+    Swaps out the weather model's workspace and code for the provided arguments
+  """
+  def change_code(weather, workspace, code) do
+    model(id: id) = Agent.get(weather, fn s -> s end)
+    Postgrex.Connection.query!(:conn, "UPDATE weather_model SET workspace='" <> workspace <> "', code='" <> code <> "' WHERE id = " <> to_string(id), [])
+    Agent.update(weather, fn s -> model(s, workspace: workspace, code: code) end)
   end
 
 
   @doc """
-  Advances the simulation state for the supplied `weather`.
+    Advances the weather model's state by one day 
   """
   def tick(weather) do
-    {:weather_model, code, state} = Agent.get(weather, fn s -> s end)
+    model(code: code, state: state) = Agent.get(weather, fn s -> s end)
     
     # Convert weather state to a Javascript object
     js = "var weather = " <>  state #to_string Poison.Encoder.encode(state, [])
@@ -93,9 +79,8 @@ defmodule Weather do
 
     # Update the `weather` state by running the Javascript code
     new_state = Execjs.eval(js) |> Poison.encode! |> to_string
-    Agent.update(weather, fn _ -> {:weather_model, code, new_state} end)
+    Agent.update(weather, fn s -> model(s, state: new_state)  end)
 
   end
-
 
 end

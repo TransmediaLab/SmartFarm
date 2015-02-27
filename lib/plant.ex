@@ -1,12 +1,20 @@
 defmodule Plant do
 
+  require Record
+
+  Record.defrecord :model, biomass: 0, lei: 0
+
   @doc """
   Starts a new plant.
   -- need to add variables & support for
   -- custom code
   """
   def start_link do
-    Agent.start_link(fn -> Map.new end)
+    Agent.start_link(fn -> model(biomass: 10) end)
+  end
+
+  def biomass(plant) do
+    IO.puts inspect Agent.get(plant, fn s -> s end)
   end
 
   @doc """

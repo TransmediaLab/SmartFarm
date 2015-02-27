@@ -253,7 +253,7 @@ function resume() {
 
   socket_lm = new WebSocket(get_appropriate_ws_url(),
                  "mirror-protocol");
-
+function connect() {
 	try {
 		socket_lm.onopen = function() {
 			document.getElementById("wslm_statustd").style.backgroundColor = "#40ff40";
@@ -285,12 +285,13 @@ function resume() {
 
 		socket_lm.onclose = function(){
 			document.getElementById("wslm_statustd").style.backgroundColor = "#ff4040";
-			document.getElementById("wslm_status").textContent = " websocket connection CLOSED ";
-		}
+			document.getElementById("wslm_status").textContent = " websocket connection CLOSD ";
+  setTimeout(5000, connect);		
+}
 	} catch(exception) {
 		alert('<p>Error' + exception);
 	}
-
+}
 	var canvas = document.createElement('canvas');
 	canvas.height = 300;
 	canvas.width = 480;

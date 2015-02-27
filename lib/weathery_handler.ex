@@ -4,7 +4,7 @@ defmodule WeatheryHandler do
   require Weather
 
   EEx.function_from_file :defp, :weather_index, "priv/templates/weather_index.html.eex", [:models]
-  EEx.function_from_file :defp, :weather_edit,  "priv/templates/weather_edit.html.eex",  [:workspace]
+  EEx.function_from_file :defp, :weather_edit,  "priv/templates/weather_edit.html.eex",  [:id, :workspace]
   EEx.function_from_file :defp, :weather_model, "priv/templates/weather_model.html.eex", [:id, :name, :desc]
 
   def init({ _any, :http }, req, []) do
@@ -31,11 +31,10 @@ defmodule WeatheryHandler do
   end
 
   defp serve(id, req) do
-    IO.puts id
     {id, code, workspace} = Database.weather_model(id)
     head = Layout.head("Weather Model Editor", [:blockly, :controls])
     nav = Layout.nav(:weather)
-    content = weather_edit(workspace)
+    content = weather_edit(id, workspace)
     {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.page(head, nav, content), req
   end
 
