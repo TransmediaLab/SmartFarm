@@ -1,52 +1,69 @@
 defmodule Plant do
+  @moduledoc """
+    Defines methods for interacting with an agent for modeling a species
+    of plant within a SmartFarm simulation.
+    
+    The population is represented as a list of keyword lists, where each
+    keyword list holds an individual plant's state.  Sowing adds new plant
+    states to the list, and harvesting removes them.  Other actions, like
+    updating the time of the simulation with tick, apply to all plants in
+    the population.
+  """
 
   require Record
 
-  Record.defrecord :model, biomass: 0, lei: 0
+  # A record for the plant agent model
+  Record.defrecordp :model, :plant, id: nil, code: "", workspace: "", population: []
+
+  @doc """
+    Loads a plant model from the database and returns a plant agent
+  """
+  def load(id) do
+    %Postgrex.Result{num_rows: 1, rows: [{id, code, workspace}]} = Postgrex.Connection.query!(:conn, "SELECT id, code, workspace FROM plants WHERE id = " <> to_string(id), [])
+    {:ok, plant} = Agent.start_link(fn -> model(id: id, code: code, workspace: workspace, population: []) end)
+    plant
+  end
 
   @doc """
   Starts a new plant.
   -- need to add variables & support for
   -- custom code
   """
-  def start_link do
-    Agent.start_link(fn -> model(biomass: 10) end)
+  def new do
+    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO plants (user_id) VALUES (1);", [])
+    %Postgrex.Result{rows: [{id}]} = Postgrex.Connection.query!(:conn, " SELECT currval(pg_get_serial_sequence('plants', 'id'));",[])
+    load id
   end
 
+  def sow(plant, {x,y}) do
+    seed = [x: x, y: y, biomass: 1] 
+    Agent.update(plant, fn model(code: code, population: population)=m -> model(m, population: [seed|population]) end)
+  end
+
+  @doc """
+    Returns the total biomass of the plant population
+  """
   def biomass(plant) do
-    IO.puts inspect Agent.get(plant, fn s -> s end)
+    Agent.get(plant, fn model(population: population) -> population end) 
+    |> Enum.map(fn s -> Keyword.get(s, :biomass, 0) end) 
+    |> Enum.sum
   end
 
   @doc """
-  Advances the plant simulation, using
-  the supplied `weather` conditions.
+    Advances the modeled plant population by one day
   """
-  def tick(plant, _weather) do
-    IO.puts("I am a plant. Hear me grow!")
+  def tick(plant) do
+    Agent.update(plant, fn model(code: code, population: pop)=m -> model(m, population: tick_helper(pop, code)) end)
   end
 
-  @doc """
-  Sows the plant's seed in the `soil`
-  """
-  def sow(plant, _soil) do
-    IO.puts("I just got planted!")
+  # Tick helper recurses through the population, updating it with supplied code
+  defp tick_helper([], code) do
+    []
   end
 
-  @doc """
-  Harvests the plant, returning a yield
-  """
-  def harvest(plant) do
-    IO.puts("I just got harvested!")
-    {:yield, 450, 0.20}
+  defp tick_helper([head|tail], code) do
+    {_, new_state} = Code.eval_string(code, head)
+    [new_state|tick_helper(tail, code)]
   end
-
-  @doc """
-  Tills the plant, killing it and putting
-  its biomass into the soil
-  """
-  def till(plant) do
-    IO.puts("I just got tilled. Goodbye.")
-  end
-
 
 end

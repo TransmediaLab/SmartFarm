@@ -13,6 +13,7 @@ defmodule SmartfarmServer do
         {'/logout', LogoutHandler, []},
         {'/signup', SignupHandler, []},
         {'/weather[/:id]', WeatherHandler, []},
+        {'/plants[/:id]', PlantHandler, []},
         {'/simulation_ws', SimulationWebSocketHandler, []},
         {'/',    HelloHandler, []}
       ]}

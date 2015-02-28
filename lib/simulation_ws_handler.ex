@@ -22,9 +22,12 @@ defmodule SimulationWebSocketHandler do
   # Requires
   require Poison
   require Record
+  require EEx
+
+  EEx.function_from_file :defp, :html_weather_status, "priv/templates/weather_status.html.eex", [:weather, :date]
 
   # A record to represent the simulation state
-  Record.defrecord :state, paused: :true, time: 0, start: 0, weather: nil
+  Record.defrecord :state, paused: :true, time: 0, start: 0, weather: nil, plants: 0
 
   @doc"""
   Initialize the websocket server and set up the inital simulation state
@@ -130,12 +133,12 @@ defmodule SimulationWebSocketHandler do
   """
   def websocket_info(:weather, req, state(weather: weather)=state) do
     Weather.tick(weather)
-    data = Weather.state(weather)
-    reply =  <<"{\"type\":\"weather\", \"data\":">> <> data <> <<"}">>
+IO.puts inspect Weather.state(weather) |> Poison.decode!
+    data = Weather.state(weather) |> Poison.decode! |> html_weather_status "Jan 1st"
+    reply =  <<"{\"type\":\"weather\", \"data\":">> <> String.replace(data, "\"", "\\\"") <> <<"}">>
     format_reply req, reply, state(state, weather: weather)
   end
 
-  
   def websocket_info(_info, req, state) do
     format_ok req, state
   end

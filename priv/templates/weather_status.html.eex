@@ -1,0 +1,9 @@
+<div class="weather-date"><%= date %></div>
+<div class="weather-icon"></div>
+<div class="weather-average-temperature"><%= weather["average_temperature"] %></div>
+<div class="weather-high-temperature"><%= weather["high_temperature"] %></div>
+<div class="weather-low-temperature"><%= weather["low_temperature"] %></div>
+<div class="weather-precipitation"><%= weather["rainfall"] + weather["snowfall"] %></div>
+<div class="weather-humidity"><%= weather["humidity"] %></div>
+<div class="weather-wind-speed"><%= weather["wind_speed"] %></div>
+<div class="weather-wind-direction"><%= weather["wind_direction"] %></div>
