@@ -32,17 +32,29 @@ defmodule User do
     password = password |> to_string
     result = Postgrex.Connection.query!(:conn, "SELECT id, crypted_password, salt FROM users WHERE username='" <> username <> "'", [])
     if result.num_rows == 0 do
-      {:fail, <<"Could not find that username and password combination.  Please try again.">>}
+      {:fail, :undefined, <<"Could not find that username and password combination.  Please try again.">>}
     else
-      [{_id, crypted_password, salt} | _tail] = result.rows
+      [{id, crypted_password, salt} | _tail] = result.rows
       test_password = :crypto.hash(:md5, password <> @secret <> salt) |> :base64.encode_to_string |> to_string
       if test_password == crypted_password do
-        {:ok, <<"Logged in as ">> <> username}
+        {:ok, id, <<"Logged in as ">> <> username}
       else
         {:fail, <<"Could not find that username and password combination.  Please try again.">>}
       end
     end
   end
+
+  @doc """
+    Returns the username for user with specified id
+  """
+  def username(:undefined) do
+    <<"Undefined">>
+  end
+  def username(id) do
+    %Postgrex.Result{rows: [{username}], num_rows: 1} = Postgrex.Connection.query!(:conn, "SELECT username FROM users WHERE id=#{id};",[])
+    username
+  end
+    
 
   @doc """
   Checks to see if the supplied username is taken.
@@ -56,5 +68,7 @@ defmodule User do
       :exists
     end
   end
+
+ 
 
 end

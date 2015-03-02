@@ -1,0 +1,27 @@
+<input type="hidden" id="weather-id" />
+<input type="hidden" id"plant-id" value="<%= id %>" />
+
+<div class="container-fluid">
+<div class="row">
+  <div class="col-md-6">
+    <%= controls %>
+  </div>
+  <div class="col-md-6">
+        January 1st 2014
+              <i class="wi wi-day-sprinkle"></i>
+              <i class="wi wi-thermometer"></i>30
+              <i class="wi wi-up"></i>48</i>
+              <i class="wi wi-down"></i></i>23
+              <i class="wi wi-fahrenheit"></i>
+              <i class="wi wi-sprinkles"></i> 20 inches
+    
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    Render Panel
+  </div>
+  <div class="col-md-6">
+    <%= blockly %>
+  </div>
+</div>

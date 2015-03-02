@@ -1,0 +1,2 @@
+Signed in as <a href="/users/<%= to_string(id) %>"><%= username %></a>. 
+Not you? <a class="navbar-link logout-link" href="/logout">Sign Out</a>

@@ -1,0 +1,3 @@
+<a class="navbar-link login-link" href="/login">Sign In</a>
+or
+<a class="signup-link" href="/signup">Sign Up</a>

@@ -28,7 +28,7 @@
           <li><a href="/weather">Weather Models</a></li>
         <% end %>
 
-        <%= if controller == :crops do %>
+        <%= if controller == :plants do %>
           <li class="active"><a href="/plants">Plant Models</a></li>
         <% else %>
           <li><a href="/crops">Plant Models</a></li>
@@ -36,16 +36,8 @@
 
       </ul>
 
-      <p class="navbar-text navbar-right">
-        <span class="logged-out">
-          <a class="navbar-link login-link" href="/login">Sign In</a>
-          or
-          <a class="signup-link" href="/signup">Sign Up</a>
-        </span>
-        <span class="logged-in">
-          <span id="logged-in-message"></span>
-          <a class="navbar-link logout-link" href="/logout">Sign Out</a>
-        </span>
+      <p id="session-message" class="navbar-text navbar-right">
+        <%= session_message %>
       </p>
        
     </div>

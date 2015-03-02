@@ -1,15 +1,13 @@
 $(function(){
 
-  $('.logged-in').hide();
-  
-  $('.login-link').on('click', function(event) {
+  $('body').on('click', '.login-link', function(event) {
     event.preventDefault();
     $('#login-dialog').modal();
     $('#login-username').focus();
     return false;
   });
 
-  $('.signup-link').on('click', function(event) {
+  $('body').on('click', '.signup-link', function(event) {
     event.preventDefault();
     $('#login-dialog').modal('hide');
     $('#signup-dialog').modal();
@@ -17,13 +15,13 @@ $(function(){
     return false;
   });
 
-  $('.logout-link').on('click', function(event) {
+  $('body').on('click', '.logout-link', function(event) {
     event.preventDefault();
     $.ajax('/logout', {
       method: "GET",
       success: function(data) {
         alert("Logged out!");
-        $('#logged-in-message').html("");
+        $('#session-message').html(data);
         $('.logged-in').hide();
         $('.logged-out').show();
       }
@@ -39,7 +37,7 @@ $(function(){
       data: {username: username, password: password},
       success: function(data) {
         $('#login-dialog').modal('hide');
-        $('#logged-in-message').html(data);
+        $('#session-message').html(data);
         $('.logged-in').show();
         $('.logged-out').hide();
       },

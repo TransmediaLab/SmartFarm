@@ -1,6 +1,6 @@
-<div id=<%= id %> class="weather">
-  <a href="/weather/<%= id %>"><%= name %></a>
+<div id="<%= to_string(id) %>" class="weather">
+  <a href="/weather/<%= to_string(id) %>"><%= name %></a>
   <div>
-    <%= desc %>
+    <%= description %>
   </div>
 </div>

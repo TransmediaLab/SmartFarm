@@ -27,12 +27,14 @@ defmodule SimulationWebSocketHandler do
   EEx.function_from_file :defp, :html_weather_status, "priv/templates/weather_status.html.eex", [:weather, :date]
 
   # A record to represent the simulation state
-  Record.defrecord :state, paused: :true, time: 0, start: 0, weather: nil, plants: 0
+  Record.defrecord :state, user_id: nil, paused: :true, time: 0, start: 0, weather: nil, plants: 0
 
   @doc"""
   Initialize the websocket server and set up the inital simulation state
   """
-  def websocket_init(_any, req, _opts) do
+  def websocket_init(_any, req, opts) do
+    # Get the user id for the signed-in user
+    user_id = Keyword.get opts, :user_id
 
     # Set the simulation start time to right now
     {mega, sec, _micro} = :erlang.now
@@ -41,7 +43,7 @@ defmodule SimulationWebSocketHandler do
     req = :cowboy_req.compact req
     req = :cowboy_req.set_resp_header("Sec-WebSocket-Protocol", "simulation-protocol", req)
 
-    format_ok req, state(start: start, time: start)
+    format_ok req, state(user_id: user_id, start: start, time: start)
   end
 
 
@@ -162,7 +164,10 @@ IO.puts inspect Weather.state(weather) |> Poison.decode!
       {bin, req} when is_binary(bin) ->
         case :cowboy_bstr.to_lower(bin) do
           "websocket" ->
-            { :upgrade, :protocol, :cowboy_websocket }
+            {val, req} = :cowboy_req.cookie(<<"userid">>, req)
+            IO.puts inspect val
+#            { :upgrade, :protocol, :cowboy_websocket }
+            { :upgrade, :protocol, :cowboy_websocket, req, [user_id: 1] }
           _ ->
             not_implemented req
         end

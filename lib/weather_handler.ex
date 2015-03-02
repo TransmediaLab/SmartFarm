@@ -9,7 +9,7 @@ defmodule WeatherHandler do
   # HTML page template functions
   EEx.function_from_file :defp, :weather_index, "priv/templates/weather_index.html.eex", [:models]
   EEx.function_from_file :defp, :weather_edit,  "priv/templates/weather_edit.html.eex",  [:id, :workspace]
-  EEx.function_from_file :defp, :weather_model, "priv/templates/weather_model.html.eex", [:id, :name, :desc]
+  EEx.function_from_file :defp, :weather_model, "priv/templates/weather_model.html.eex", [:id, :name, :description]
 
   @doc """
     Initializes the http handler
@@ -22,8 +22,30 @@ defmodule WeatherHandler do
     handles page requests
   """
   def handle(req, state) do
-    { id, req} = :cowboy_req.binding(:id, req, :all)
-    {:ok, req} = serve(id, req)
+    {user_id, req} = :cowboy_req.cookie(<<"userid">>, req, nil)
+    {id, req} = :cowboy_req.binding(:id, req, :all)
+    case id do 
+      :all ->
+         %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT id, name, description FROM weather;", [])
+         content = Enum.map(rows, fn {id, name, desc} -> weather_model(id, name, desc) end)
+         options = [
+           title: <<"Weather Models">>,
+           controller: :weather,
+           user_id: user_id
+         ]
+         {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.page(content, options), req
+      id ->
+         options = [
+           title: <<"Weather Model Editor">>,
+           controller: :weather,
+           user_id: user_id,
+           controls: true,
+           blockly: true
+         ]
+         {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.page(weather_edit(id,""), options), req
+         
+    end
+ #   {:ok, req} = serve(id, req)
     {:ok, req, state}
   end
 

@@ -1,5 +1,3 @@
-<%= Layout.hint "Go here for fun" %>
-
 <div id="blocklyDiv" style="height: 480px; width: 100%;"></div>
 
 <%# workspace %>

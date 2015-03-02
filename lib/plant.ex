@@ -35,6 +35,9 @@ defmodule Plant do
     load id
   end
 
+  @doc """
+    Establishes a new plant in the population at location {x, y}
+  """
   def sow(plant, {x,y}) do
     seed = [x: x, y: y, biomass: 1] 
     Agent.update(plant, fn model(code: code, population: population)=m -> model(m, population: [seed|population]) end)
@@ -47,6 +50,9 @@ defmodule Plant do
     Agent.get(plant, fn model(population: population) -> population end) 
     |> Enum.map(fn s -> Keyword.get(s, :biomass, 0) end) 
     |> Enum.sum
+  end
+
+  def to_svg() do
   end
 
   @doc """

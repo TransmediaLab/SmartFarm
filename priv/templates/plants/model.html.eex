@@ -1,0 +1,6 @@
+<div id=<%= id %> class="plant">
+  <a href="/plants/<%= id %>"><%= name %></a>
+  <div>
+    <%= description %>
+  </div>
+</div>
