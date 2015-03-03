@@ -6,6 +6,6 @@
   <body>
     <%= navigation %>
     <%= content %>
-    <%= login %>
+    <%= extras %>
   </body>
 </html>

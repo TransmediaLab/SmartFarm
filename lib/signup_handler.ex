@@ -1,21 +1,20 @@
 defmodule SignupHandler do
   @moduledoc """
-  Handles AJAX-based account creation
+    Handles AJAX-based account creation
   """
 
   @doc """
-  Initializes the handler
+    Initializes the handler
   """
   def init({ _any, :http }, req, state) do
     { :ok, req, state }
   end
 
   @doc """
-  Handles requests 
+    Handles account creation requests 
   """
   def handle(req, state) do
     {:ok, fields, req} = :cowboy_req.body_qs(req)
-IO.puts inspect fields
     {"username", username} = List.keyfind fields, "username", 0
     {"password", password} = List.keyfind fields, "password", 0
     {"password_confirmation", password_confirmation} = List.keyfind fields, "password_confirmation", 0
@@ -34,7 +33,7 @@ IO.puts inspect fields
   end
 
   @doc """
-  Closes the handler
+    Closes the handler
   """
   def terminate(_reason, _request, _state) do
     :ok
