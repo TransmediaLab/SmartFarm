@@ -23,6 +23,7 @@ defmodule LoginHandler do
         {"username", username} = List.keyfind fields, "username", 0
         {"password", password} = List.keyfind fields, "password", 0
         {status, user_id, message} = User.authenticate(username, password)
+IO.puts "AUTHENTICATED AS #{user_id}"
         if status == :ok do
           req = :cowboy_req.set_resp_cookie(<<"userid">>, to_string(user_id), [], req)
           {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], session(user_id, username), req

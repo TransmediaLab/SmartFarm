@@ -2,10 +2,8 @@ defmodule Layout do
 
   require EEx
 
-  EEx.function_from_file :def, :page, 		"priv/templates/page.html.eex", [:head, :nav, :content, :login]
-  EEx.function_from_file :def, :alert,		"priv/templates/alert.html.eex", [:level, :message]
-  EEx.function_from_file :def, :hint,		"priv/templates/hint_panel.html.eex", [:hint]
-
+  # private html rendering API
+  EEx.function_from_file :defp, :page,		"priv/templates/page.html.eex", [:head, :navigation, :content, :extras]
   EEx.function_from_file :defp, :head_base,	"priv/templates/head_base.html.eex", [:title]
   EEx.function_from_file :defp, :head_blockly,	"priv/templates/head_blockly.html.eex", []
   EEx.function_from_file :defp, :head_controls,	"priv/templates/head_controls.html.eex", []
@@ -15,7 +13,25 @@ defmodule Layout do
   EEx.function_from_file :defp, :session_live,	"priv/templates/session_logged_in.html.eex", [:id, :username]
   EEx.function_from_file :defp, :session_dead,	"priv/templates/session_logged_out.html.eex", []
 
-  EEx.function_from_file :def, :blockly,       "priv/templates/editor/blockly.html.eex", []
+  @doc """
+    Renders the provided message as a Bootstrap (http://getbootstrap.com) alert at
+    the supplied warning level
+  """
+  EEx.function_from_file :def, :alert,		"priv/templates/alert.html.eex", [:level, :message]
+
+  @doc """
+    Renders the provided hint in a styled Bootstrap (http://getbootstrap.com) HTML panel
+  """
+  EEx.function_from_file :def, :hint,		"priv/templates/hint_panel.html.eex", [:hint]
+
+  @doc """
+    Renders a Blockly editor panel
+  """
+  EEx.function_from_file :def, :blockly,	"priv/templates/editor/blockly.html.eex", []
+
+  @doc """
+    Renders a series of buttons to control a SmartFarm simulation
+  """
   EEx.function_from_file :def, :controls,	"priv/templates/editor/controls.html.eex", []
 
   @doc """ 
@@ -58,43 +74,5 @@ defmodule Layout do
     # body
     page(head, navigation, content, extras)
   end
-
-
-
-
-
-
-
-
-
-  # TODO: Remove this one
-  def page(head, navigation, content) do
-    extras = login() <> signup()
-    page(head, navigation, content, extras) 
-  end
-
-  def head(title, options) do
-    html_text = head_base(title)
-    head_section(html_text, options)
-  end
-
-  def nav(user_id, controller) do
-    navigation(controller, user_id)
-  end
-
-
-  defp head_section(text, []) do
-    text
-  end
-
-  defp head_section(text, [:blockly | tail]) do
-    head_section(text <> head_blockly(), tail)
-  end
-
-  defp head_section(text, [:controls | tail]) do
-    head_section(text <> head_controls(), tail)
-  end
-
-  
 
 end

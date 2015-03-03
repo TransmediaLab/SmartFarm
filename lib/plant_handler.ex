@@ -22,6 +22,7 @@ defmodule PlantHandler do
   """
   def handle(req, state) do
     {user_id, req} = :cowboy_req.cookie(<<"userid">>, req, nil)
+IO.puts "USER_ID IS #{user_id}"
     { id, req} = :cowboy_req.binding(:id, req, :all)
     case id do
       :all ->

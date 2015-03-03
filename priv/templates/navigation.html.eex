@@ -31,7 +31,7 @@
         <%= if controller == :plants do %>
           <li class="active"><a href="/plants">Plant Models</a></li>
         <% else %>
-          <li><a href="/crops">Plant Models</a></li>
+          <li><a href="/plants">Plant Models</a></li>
         <% end %>
 
       </ul>

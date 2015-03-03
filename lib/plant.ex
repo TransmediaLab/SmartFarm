@@ -13,26 +13,51 @@ defmodule Plant do
   require Record
 
   # A record for the plant agent model
-  Record.defrecordp :model, :plant, id: nil, code: "", workspace: "", population: []
+  Record.defrecordp :model, :plant, id: nil, user_id: nil, code: "", workspace: "", population: []
 
   @doc """
     Loads a plant model from the database and returns a plant agent
   """
   def load(id) do
-    %Postgrex.Result{num_rows: 1, rows: [{id, code, workspace}]} = Postgrex.Connection.query!(:conn, "SELECT id, code, workspace FROM plants WHERE id = " <> to_string(id), [])
-    {:ok, plant} = Agent.start_link(fn -> model(id: id, code: code, workspace: workspace, population: []) end)
+    %Postgrex.Result{num_rows: 1, rows: [{user_id, code, workspace}]} = Postgrex.Connection.query!(:conn, "SELECT user_id, code, workspace FROM plants WHERE id = " <> to_string(id), [])
+    {:ok, plant} = Agent.start_link(fn -> model(id: id, user_id: user_id, code: code, workspace: workspace, population: []) end)
     plant
   end
 
   @doc """
-  Starts a new plant.
-  -- need to add variables & support for
-  -- custom code
+    Starts a new plant.
   """
-  def new do
-    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO plants (user_id) VALUES (1);", [])
+  def new(user_id) do
+    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO plants (user_id) VALUES (#{user_id});", [])
     %Postgrex.Result{rows: [{id}]} = Postgrex.Connection.query!(:conn, " SELECT currval(pg_get_serial_sequence('plants', 'id'));",[])
     load id
+  end
+
+  @doc """
+    Changes the code for the specified plant model.
+  """
+  def change_code(plant, code, workspace) do
+    Agent.update(plant, fn p -> model(p, code: code, workspace: workspace) end)
+  end
+
+  @doc """
+    Saves the current plant model for the current user. 
+    If this is the plant model's owner, the current database entry is overwritten.
+    Otherwise, a clone of the plant is created.
+  """
+  def save(plant, current_user_id) do
+    {id, user_id, code, workspace} = Agent.get(plant, fn model(id: id, user_id: user_id, code: code, workspace: workspace) -> {id, user_id, code, workspace} end)
+IO.puts "CURRENT USER is #{inspect current_user_id}, OWNER is #{inspect to_string user_id}"
+    if current_user_id == to_string(user_id) do
+IO.puts "SAVING PLANT WITH MATCHING USER"
+      Postgrex.Connection.query!(:conn, "UPDATE plants SET code='#{code}', workspace='#{workspace}' WHERE id=#{id}", [])
+    else
+IO.puts "CLONING PLANT"
+      %Postgrex.Result{num_rows: 1, rows: [{name, description}]} = Postgrex.Connection.query!(:conn, "SELECT name, description FROM plants WHERE id=#{id}", [])
+      %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO plants (user_id, name, description, code, workspace) VALUES (#{current_user_id}, '#{name}', '#{description}', '#{code}', '#{workspace}');", [])
+      %Postgrex.Result{rows: [{id}]} = Postgrex.Connection.query!(:conn, " SELECT currval(pg_get_serial_sequence('plants', 'id'));",[])  
+      Agent.update(plant, fn s -> model(s, id: id, user_id: current_user_id) end)
+    end
   end
 
   @doc """
@@ -41,6 +66,13 @@ defmodule Plant do
   def sow(plant, {x,y}) do
     seed = [x: x, y: y, biomass: 1] 
     Agent.update(plant, fn model(code: code, population: population)=m -> model(m, population: [seed|population]) end)
+  end
+
+  @doc """
+    Returns the Blockly workspace for the plant model.
+  """
+  def workspace(plant) do
+    Agent.get(plant, fn model(workspace: workspace) -> workspace end) |> String.replace("\"", "\\\"")
   end
 
   @doc """

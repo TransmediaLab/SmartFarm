@@ -4,7 +4,7 @@
     <%= head %>
   </head>
   <body>
-    <%= nav %>
+    <%= navigation %>
     <%= content %>
     <%= login %>
   </body>

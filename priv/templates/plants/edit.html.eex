@@ -1,5 +1,5 @@
 <input type="hidden" id="weather-id" />
-<input type="hidden" id"plant-id" value="<%= id %>" />
+<input type="hidden" id="plant-id" value="<%= id %>" />
 
 <div class="container-fluid">
 <div class="row">

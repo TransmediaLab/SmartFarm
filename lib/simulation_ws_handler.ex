@@ -1,17 +1,10 @@
 defmodule SimulationWebSocketHandler do
   @moduledoc """
-  This module upgrades an HTTP connection to a WebSocket that manages
-  a SmartFarm simulation.  
-
-  Because JavaScript measures time in milliseconds since 1/1/1970, we will
-  use that representation for simulation time as well.
-
- {:ok, req, new_state} ->
-        format_ok req, state(state, handler_state: new_state)
-
-      {:reply, reply, req, new_state} ->
-        format_reply req, reply, state(state, handler_state: new_state)
-
+    This module upgrades an HTTP connection to a WebSocket that manages
+    a SmartFarm simulation.  
+    
+    Because JavaScript measures time in milliseconds since 1/1/1970, we will
+    use that representation for simulation time as well.
   """
 
   @step_delay 1000 
@@ -27,7 +20,7 @@ defmodule SimulationWebSocketHandler do
   EEx.function_from_file :defp, :html_weather_status, "priv/templates/weather_status.html.eex", [:weather, :date]
 
   # A record to represent the simulation state
-  Record.defrecord :state, user_id: nil, paused: :true, time: 0, start: 0, weather: nil, plants: 0
+  Record.defrecord :state, user_id: nil, paused: :true, time: 0, start: 0, weather: nil, plants: []
 
   @doc"""
   Initialize the websocket server and set up the inital simulation state
@@ -35,7 +28,7 @@ defmodule SimulationWebSocketHandler do
   def websocket_init(_any, req, opts) do
     # Get the user id for the signed-in user
     user_id = Keyword.get opts, :user_id
-
+IO.puts "USER ID IN WS IS #{user_id}"
     # Set the simulation start time to right now
     {mega, sec, _micro} = :erlang.now
     start = (mega * 1000000 + sec) * 1000
@@ -90,14 +83,33 @@ defmodule SimulationWebSocketHandler do
           reply = <<"{\"type\": \"workspace\", \"data\":\"">> <> workspace <> <<"\"}">>
           format_reply(req, reply, state(state, weather: weather))
 
-       "update-weather" ->
+      "update-weather" ->
           IO.puts("update weather")
           state(weather: weather) = state
           Weather.change_code(weather, json["data"]["workspace"], json["data"]["code"])
           Database.update_weather_model(1, json["data"]["workspace"])
           format_ok(req, state)
 
-      _ ->
+      # Plant messages
+      "load-plants" ->
+          IO.puts "Loading plant"
+          plant = Plant.load json["data"]["id"]
+          workspace = Plant.workspace(plant)
+          reply = <<"{\"type\": \"workspace\", \"data\":\"">> <> workspace <> <<"\"}">>
+          format_reply(req, reply, state(state, plants: [plant]))
+
+      "change-plants" ->
+          state(plants: [plant]) = state
+          Plant.change_code(plant, json["data"]["code"], json["data"]["workspace"])
+          format_ok(req, state)
+
+      "save-plants" ->
+          state(user_id: user_id, plants: [plant]) = state
+          Plant.save(plant, user_id)
+          format_ok(req, state)
+
+      msg ->
+IO.puts inspect msg
           format_ok(req, state)
 
     end
@@ -164,10 +176,8 @@ IO.puts inspect Weather.state(weather) |> Poison.decode!
       {bin, req} when is_binary(bin) ->
         case :cowboy_bstr.to_lower(bin) do
           "websocket" ->
-            {val, req} = :cowboy_req.cookie(<<"userid">>, req)
-            IO.puts inspect val
-#            { :upgrade, :protocol, :cowboy_websocket }
-            { :upgrade, :protocol, :cowboy_websocket, req, [user_id: 1] }
+            {user_id, req} = :cowboy_req.cookie(<<"userid">>, req)
+            { :upgrade, :protocol, :cowboy_websocket, req, [user_id: user_id] }
           _ ->
             not_implemented req
         end

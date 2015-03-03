@@ -16,6 +16,23 @@ jQuery(function() {
     if(weather_id) {
       ws.send('{"type":"load-weather","data":{"id":' + weather_id + '}}');
     }
+    var plant_id = $('#plant-id').val()
+    if(plant_id) {
+      ws.send('{"type":"load-plants","data":{"id":' + plant_id + '}}');
+    }
+    Blockly.addChangeListener(function(){
+      var xml = Blockly.Xml.workspaceToDom(Blockly.getMainWorkspace()),
+          xmlText, 
+          code,
+          msg = {data:{}};
+      msg.type = "change-" + document.location.pathname.split("/")[1]
+      xml.id = "workspace";
+      xml.setAttribute("style", "display: none");
+      msg.data.workspace = Blockly.Xml.domToText(xml);
+      msg.data.code = Blockly.JavaScript.workspaceToCode();
+      ws.send(JSON.stringify(msg));    
+console.log(msg);
+    });
   };
 
   $('#run').prop('disabled', false)
@@ -53,6 +70,11 @@ jQuery(function() {
 
   $('#save').on('click', function(){
 console.log('saving');
+    var msg = {}
+    msg.type = "save-" + document.location.pathname.split("/")[1]
+    ws.send(JSON.stringify(msg));
+console.log(msg);
+/*
     var xml = Blockly.Xml.workspaceToDom(Blockly.getMainWorkspace()),
         xmlText, 
         code,
@@ -63,6 +85,7 @@ console.log('saving');
     msg.data.workspace = Blockly.Xml.domToText(xml);
     msg.data.code = Blockly.JavaScript.workspaceToCode();
     ws.send(JSON.stringify(msg));
+*/
   });
 
   /* Server response handling */

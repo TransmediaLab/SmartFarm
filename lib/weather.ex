@@ -9,16 +9,16 @@ defmodule Weather do
   require Execjs
 
   # A record for the weather agent model
-  Record.defrecordp :model, id: nil, workspace: <<"">>, code: <<"">>, state: <<"">>
+  Record.defrecordp :model, id: nil, user_id: nil, workspace: <<"">>, code: <<"">>, state: <<"">>
 
   @doc """
     Loads a weather model from the database and returns a weather agent
   """
   def load(id) do
-    result = Postgrex.Connection.query!(:conn, "SELECT code, workspace FROM weather_model WHERE id = " <> to_string(id), []) 
-    [{code, workspace} | _tail]  = result.rows
+    result = Postgrex.Connection.query!(:conn, "SELECT user_id, code, workspace FROM weather_model WHERE id = " <> to_string(id), []) 
+    [{user_id, code, workspace} | _tail]  = result.rows
     state = <<"{}">>
-    {:ok, agent} = Agent.start_link(fn -> model(id: id, workspace: workspace, code: code, state: state) end)
+    {:ok, agent} = Agent.start_link(fn -> model(id: id, user_id: user_id, workspace: workspace, code: code, state: state) end)
     agent
   end
 
