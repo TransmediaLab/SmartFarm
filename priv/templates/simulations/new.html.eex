@@ -1,0 +1,33 @@
+<div class="container-fluid">
+  <h1>Create a New SmartFarm Simulation</h1>
+  <p>
+    Complete the steps below to create your own SmartFarm,
+    which you can then simulate!
+  </p>
+
+  <h2>Step 1: Location</h2>
+  <p> 
+    Where will you locate your farm?  You can search for a location, 
+    enter the latitude & longitude manully, or drag the map marker to
+    the location you want.
+  </p>
+  <div class="form-inline">
+    <div class="form-group">
+      <label for="latitude">Latitude</label>
+      <input type="text" class="form-control" id="latitude" />
+    </div>
+    <div class="form-group">
+      <label for="longitude">Longitude</label>
+      <input type="text" class="form-control" id="longitude" />
+    </div>
+    <div class="form-group">
+      <label for="location-search">Search</label>
+      <input type="text" class="form-control" id="location-search" />
+      <span class="glyphicon glyphicon-search from-control-feedback"
+    </div>
+  </div>
+
+
+
+
+</div>

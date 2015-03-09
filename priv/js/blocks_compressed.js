@@ -159,7 +159,29 @@ this.appendValueInput("LIST").setCheck("Array").appendField(Blockly.Msg.LISTS_GE
 Blockly.INPUT_VALUE;a.setAttribute("at1",b);b=this.getInput("AT2").type==Blockly.INPUT_VALUE;a.setAttribute("at2",b);return a},domToMutation:function(a){var b="true"==a.getAttribute("at1");a="true"==a.getAttribute("at2");this.updateAt_(1,b);this.updateAt_(2,a)},updateAt_:function(a,b){this.removeInput("AT"+a);this.removeInput("ORDINAL"+a,!0);b?(this.appendValueInput("AT"+a).setCheck("Number"),Blockly.Msg.ORDINAL_NUMBER_SUFFIX&&this.appendDummyInput("ORDINAL"+a).appendField(Blockly.Msg.ORDINAL_NUMBER_SUFFIX)):
 this.appendDummyInput("AT"+a);var c=new Blockly.FieldDropdown(this["WHERE_OPTIONS_"+a],function(c){var e="FROM_START"==c||"FROM_END"==c;if(e!=b){var f=this.sourceBlock_;f.updateAt_(a,e);f.setFieldValue(c,"WHERE"+a);return null}});this.getInput("AT"+a).appendField(c,"WHERE"+a);1==a&&(this.moveInputBefore("AT1","AT2"),this.getInput("ORDINAL1")&&this.moveInputBefore("ORDINAL1","AT2"));Blockly.Msg.LISTS_GET_SUBLIST_TAIL&&this.moveInputBefore("TAIL",null)}};
 Blockly.Blocks.lists_split={init:function(){var a=this,b=new Blockly.FieldDropdown([[Blockly.Msg.LISTS_SPLIT_LIST_FROM_TEXT,"SPLIT"],[Blockly.Msg.LISTS_SPLIT_TEXT_FROM_LIST,"JOIN"]],function(b){"SPLIT"==b?(a.outputConnection.setCheck("Array"),a.getInput("INPUT").setCheck("String")):(a.outputConnection.setCheck("String"),a.getInput("INPUT").setCheck("Array"))});this.setHelpUrl(Blockly.Msg.LISTS_SPLIT_HELPURL);this.setColour(260);this.appendValueInput("INPUT").setCheck("String").appendField(b,"MODE");
-this.appendValueInput("DELIM").setCheck("String").appendField(Blockly.Msg.LISTS_SPLIT_WITH_DELIMITER);this.setInputsInline(!0);this.setOutput(!0,"Array");this.setTooltip(function(){var b=a.getFieldValue("MODE");if("SPLIT"==b)return Blockly.Msg.LISTS_SPLIT_TOOLTIP_SPLIT;if("JOIN"==b)return Blockly.Msg.LISTS_SPLIT_TOOLTIP_JOIN;throw"Unknown mode: "+b;})}};
+this.appendValueInput("DELIM").setCheck("String").appendField(Blockly.Msg.LISTS_SPLIT_WITH_DELIMITER);this.setInputsInline(!0);this.setOutput(!0,"Array");this.setTooltip(function(){var b=a.getFieldValue("MODE");if("SPLIT"==b)return Blockly.Msg.LISTS_SPLIT_TOOLTIP_SPLIT;if("JOIN"==b)return Blockly.Msg.LISTS_SPLIT_TOOLTIP_JOIN;throw"Unknown mode: "+b;})}};/*
+
+ SmartFarm hackable glass simulation, built on Google's Blockly
+
+ Copyright 2014 Computing and Information Sciences, Kansas State University.
+ http://smartfarm.cis.k-state.edu
+
+ Copyright 2012 Google Inc.
+ https://developers.google.com/blockly/
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+Blockly.Blocks.simulation_get_latitude={init:function(){this.setHelpUrl("http://www.example.com/");this.setColour(330);this.appendDummyInput().appendField("Latitude in Degrees");this.setInputsInline(!0);this.setOutput(!0,"Number");this.setTooltip("")}};Blockly.Blocks.simulation_get_longitude={init:function(){this.setHelpUrl("http://www.example.com/");this.setColour(330);this.appendDummyInput().appendField("Longitude in Degrees");this.setInputsInline(!0);this.setOutput(!0,"Number");this.setTooltip("")}};
 // Copyright 2012 Google Inc.  Apache License 2.0
 Blockly.Blocks.text={};Blockly.Blocks.text={init:function(){this.setHelpUrl(Blockly.Msg.TEXT_TEXT_HELPURL);this.setColour(160);this.appendDummyInput().appendField(this.newQuote_(!0)).appendField(new Blockly.FieldTextInput(""),"TEXT").appendField(this.newQuote_(!1));this.setOutput(!0,"String");this.setTooltip(Blockly.Msg.TEXT_TEXT_TOOLTIP)},newQuote_:function(a){return new Blockly.FieldImage(Blockly.pathToMedia+(a==Blockly.RTL?"quote1.png":"quote0.png"),12,12,'"')}};
 Blockly.Blocks.text_join={init:function(){this.setHelpUrl(Blockly.Msg.TEXT_JOIN_HELPURL);this.setColour(160);this.itemCount_=2;this.updateShape_();this.setOutput(!0,"String");this.setMutator(new Blockly.Mutator(["text_create_join_item"]));this.setTooltip(Blockly.Msg.TEXT_JOIN_TOOLTIP)},mutationToDom:function(){var a=document.createElement("mutation");a.setAttribute("items",this.itemCount_);return a},domToMutation:function(a){this.itemCount_=parseInt(a.getAttribute("items"),10);this.updateShape_()},

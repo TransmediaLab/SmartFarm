@@ -47,12 +47,9 @@ defmodule Plant do
   """
   def save(plant, current_user_id) do
     {id, user_id, code, workspace} = Agent.get(plant, fn model(id: id, user_id: user_id, code: code, workspace: workspace) -> {id, user_id, code, workspace} end)
-IO.puts "CURRENT USER is #{inspect current_user_id}, OWNER is #{inspect to_string user_id}"
     if current_user_id == to_string(user_id) do
-IO.puts "SAVING PLANT WITH MATCHING USER"
       Postgrex.Connection.query!(:conn, "UPDATE plants SET code='#{code}', workspace='#{workspace}' WHERE id=#{id}", [])
     else
-IO.puts "CLONING PLANT"
       %Postgrex.Result{num_rows: 1, rows: [{name, description}]} = Postgrex.Connection.query!(:conn, "SELECT name, description FROM plants WHERE id=#{id}", [])
       %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO plants (user_id, name, description, code, workspace) VALUES (#{current_user_id}, '#{name}', '#{description}', '#{code}', '#{workspace}');", [])
       %Postgrex.Result{rows: [{id}]} = Postgrex.Connection.query!(:conn, " SELECT currval(pg_get_serial_sequence('plants', 'id'));",[])  

@@ -7,6 +7,7 @@ defmodule Layout do
   EEx.function_from_file :defp, :head_base,	"priv/templates/head_base.html.eex", [:title]
   EEx.function_from_file :defp, :head_blockly,	"priv/templates/head_blockly.html.eex", []
   EEx.function_from_file :defp, :head_controls,	"priv/templates/head_controls.html.eex", []
+  EEx.function_from_file :defp, :head_maps,	"priv/templates/head_maps.html.eex", []
   EEx.function_from_file :defp, :navigation, 	"priv/templates/navigation.html.eex", [:controller, :session_message]
   EEx.function_from_file :defp, :login, 	"priv/templates/login.html.eex", []
   EEx.function_from_file :defp, :signup,	"priv/templates/signup.html.eex", []
@@ -44,8 +45,10 @@ defmodule Layout do
     user_name:	""	The logged-in user's name
     user_id:	nil	The logged-in user's id
     controller:	""	The navigation section related to the current page
-    controls:	false	If the page will include simulation controls
-    blockly:	false	If the page will include a blockly editor 
+    controls:	false	If true the page will include simulation controls
+    blockly:	false	If true the page will include a blockly editor 
+    maps: 	false	If true the page will include google maps api
+    scripts: 	[]	Array of paths to additional JavaScript script files to load
   """
   def page(content, options) do
 
@@ -57,6 +60,11 @@ defmodule Layout do
     if Keyword.get(options, :controls, false) do
       head = head <> head_controls()
     end
+    if Keyword.get(options, :maps, false) do
+      head = head <> head_maps()
+    end
+    scripts = Keyword.get(options, :scripts, []) 
+    head = head <> script_tags("", scripts)
 
     # navigation
     controller = Keyword.get(options, :controller, :undefined)
@@ -71,8 +79,25 @@ defmodule Layout do
     # extras
     extras = login() <> signup()
 
+    # data
+    data = Keyword.get(options, :data, false)
+    if data do
+      extras = extras <> "<script type='text/javascript'>var data=#{data}</script>"
+    end
+
     # body
     page(head, navigation, content, extras)
+
+  end
+
+  # Generates a script tag from a list of script paths
+  defp script_tags(acc, []) do
+    acc
+  end
+
+  defp script_tags(acc, [head|tail]) do
+    acc = "<script type='text/javascript' src='#{head}'></script>" <> acc
+    script_tags(acc, tail)
   end
 
 end

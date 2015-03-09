@@ -3,6 +3,10 @@
 <%# workspace %>
   
 <xml id="toolbox" style="display: none">
+  <category name="Simulation">
+    <block type="simulation_get_latitude"></block>
+    <block type="simulation_get_longitude"></block>
+  </category>
   <category name="Weather">
     <block type="weather_set_precipitation">
       <value name="PRECIPITATION">
