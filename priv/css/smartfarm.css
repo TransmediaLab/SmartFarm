@@ -24,9 +24,19 @@
   width: 100%;
   min-height: 480px;
 }
-.weather > a {
+.search-result > .title {
+  display: block;
   font-size: 14pt;
   color: green;
+}
+.search-result > .owner {
+  display: block;
+  font-size: 12pt;
+  color: brown;
+}
+.search-result > p {
+  font-size: 10pt;
+  color: black;
 }
 .point {
   display: inline-block;

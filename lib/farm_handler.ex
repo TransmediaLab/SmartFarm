@@ -7,9 +7,10 @@ defmodule FarmHandler do
   require Farm
 
   # HTML page template functions
+  EEx.function_from_file :defp, :farm_index, "priv/templates/farms/index.html.eex", [:farms]
   EEx.function_from_file :defp, :farm_new,   "priv/templates/farms/new.html.eex",   []
   EEx.function_from_file :defp, :farm_edit,  "priv/templates/farms/edit.html.eex",  []
-  EEx.function_from_file :defp, :farm_model, "priv/templates/farms/model.html.eex", [:id, :name, :description]
+  EEx.function_from_file :defp, :farm_model, "priv/templates/farms/model.html.eex", [:id, :user_id, :username, :name, :description]
 
   @doc """
     Initializes the http handler
@@ -36,8 +37,9 @@ defmodule FarmHandler do
           ]
           {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.page(content, options), req
       :all ->
-         %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT id, name, description FROM farms;", [])
-         content = Enum.map(rows, fn {id, name, desc} -> farm_model(id, name, desc) end)
+         content = Database.list_farms 
+           |> Enum.map(fn {id, user_id, username, name, desc} -> farm_model(id, user_id, username, name, desc) end)
+           |> farm_index
          options = [
            title: <<"Farm Models">>,
            controller: :farms,

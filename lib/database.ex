@@ -35,6 +35,10 @@ defmodule Database do
   end
 
 
+  def list_farms() do
+    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT farms.id, farms.user_id, users.username, farms.name, farms.description FROM farms, users WHERE users.id = farms.user_id;", [])
+    rows
+  end
 
   @doc """
     Returns a Map containing the properties of the farm specified by *id*
