@@ -1,0 +1,49 @@
+CREATE TABLE users 
+  id SEQUENCE PRIMARY KEY, 
+  username TEXT UNIQUE NOT NULL, 
+  crypted_password TEXT NOT NULL, 
+  salt TEXT NOT NULL;
+
+CREATE TABLE weather 
+  id SEQUENCE PRIMARY KEY, 
+  user_id INTEGER REFERENCES users(id) NOT NULL, 
+  name TEXT,
+  description TEXT, 
+  code TEXT, 
+  workspace TEXT, 
+  search TSVECTOR;
+
+CREATE TRIGGER weather_tsvector_update 
+  BEFORE INSERT OR UPDATE ON weather 
+  FOR EACH ROW EXECUTE PROCEDURE 
+  tsvector_update_trigger(search, 'pg_catalog.english', name, description); 
+
+CREATE TABLE plants
+  id SEQUENCE PRIMARY KEY
+  user_id INTEGER REFERENCES users(id) NOT NULL,
+  name TEXT,
+  description TEXT,
+  code TEXT,
+  workspace TEXT,
+  search TSVECTOR;
+
+CREATE TRIGGER plant_tsvector_udpate
+  BEFORE INSERT OR UPDATE ON plants
+  FOR EACH ROW EXECUTE PROCEDURE
+  tsvector_update_trigger(search, 'pg_catalog.english', name, description);
+
+CREATE TABLE farms
+  id SEQUENCE PRIMARY KEY
+  user_id INTEGER REFERENCES users(id) NOT NULL,
+  name TEXT,
+  description TEXT,
+  latitude FLOAT,
+  longitude FLOAT,
+  fields TEXT,
+  workspace TEXT,
+  search TSVECTOR;
+
+CREATE TRIGGER farm_tsvector_udpate
+  BEFORE INSERT OR UPDATE ON farms
+  FOR EACH ROW EXECUTE PROCEDURE
+  tsvector_update_trigger(search, 'pg_catalog.english', name, description);

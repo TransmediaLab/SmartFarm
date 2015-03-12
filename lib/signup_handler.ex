@@ -22,7 +22,9 @@ defmodule SignupHandler do
     if password != password_confirmation do
       {:ok, req} = :cowboy_req.reply 403, [{"Content-Type", "text/html"}], Layout.alert(<<"danger">>, <<"Password fields must match">>), req
     else
+IO.puts "User.create being called"
       {status, message} = User.create(username, password, teacher)
+IO.puts message
       if status == :ok do
         {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.alert(<<"info">>, message), req
       else

@@ -2,41 +2,101 @@ defmodule Database do
 
   require Record
   
+  @rows_to_list 2
+
   def init do
-    {:ok, pid} = Postgrex.Connection.start_link(hostname: "localhost", username: "smartfarm", password: "smartFARMING", database: "smartfarm")
+    {:ok, pid} = Postgrex.Connection.start_link(hostname: "localhost", username: "smartfarm", password: "smartFARMING", database: "smartfarm_#{Mix.env}")
     Process.register(pid, :conn)
   end
 
-  def check_for_username(username) do
-    result = Postgrex.Connection.query!(:conn, "SELECT id FROM users WHERE username='" <> username <> "'", [])
+  @doc """
+    Checks to see if *username* already exists in the database
+  """
+  def username_available?(username) do
+    result = Postgrex.Connection.query!(:conn, "SELECT id FROM users WHERE username='#{esc(username)}'", [])
     if result.num_rows == 0 do
-      :unknown
+      true
     else
-      :exists
+      false
     end
   end
 
-  def create_user(username, crypted_password) do
+  @doc """
+    Returns a map of the properties for the user with the supplied *username*
+  """
+  def user_with_username(username) do
+    %Postgrex.Result{num_rows: 1, rows: [{id, username, crypted_password, salt, role}]} = Postgrex.Connection.query!(:conn, "SELECT id, username, crypted_password, salt, role FROM users WHERE username = '#{esc(username)}';", [])
+    %{id: id, username: username, crypted_password: crypted_password, salt: salt, role: role}
   end
 
-  def list_weather_models do
-    result = Postgrex.Connection.query!(:conn, "SELECT id, name, description FROM weather_model", [])
-    result.rows
+  @doc """
+    Lists the users currently in the database
+  """
+  def list_users(last_id \\ 0) do
+    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT id, username FROM users;", [])
+    rows
   end
 
-  def weather_model(id) do
-    result = Postgrex.Connection.query!(:conn, "SELECT id, code, workspace FROM weather_model WHERE id = " <> to_string(id), [])
-    [head | _tail]  = result.rows
-    head
+  @doc """
+    Returns a map of the properties for the user specified by *id*
+  """
+  def user(id) do
+    %Postgrex.Result{num_rows: 1, rows: [{username, crypted_password, salt, role}]} = Postgrex.Connection.query!(:conn, "SELECT username, crypted_password, salt, role FROM users WHERE id = #{id};", [])
+    %{username: username, crypted_password: crypted_password, salt: salt, role: role}
   end
 
-  def update_weather_model(id, workspace) do
-    Postgrex.Connection.query!(:conn, "UPDATE weather_model SET workspace='" <> workspace <> "' WHERE id = " <> to_string(id), [])
+  @doc """
+    Creates a new user populated with the properties in *data*
+  """
+  def user(nil, data)do
+    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO users (username, crypted_password, salt, role) VALUES ('#{esc(data.username)}', '#{data.crypted_password}', '#{data.salt}', #{data.role});", [])
+    %Postgrex.Result{rows: [{id}]} = Postgrex.Connection.query!(:conn, "SELECT currval(pg_get_serial_sequence('users', 'id'));", [])
+    id  
   end
 
 
-  def list_farms() do
-    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT farms.id, farms.user_id, users.username, farms.name, farms.description FROM farms, users WHERE users.id = farms.user_id;", [])
+  @doc """
+    Lists the weather currently in the database
+  """
+  def list_weather(last_id \\ 0) do
+    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT weather.id, weather.user_id, users.username, weather.name, weather.description FROM weather, users WHERE users.id = weather.user_id AND weather.id > #{last_id} ORDER BY weather.id LIMIT #{@rows_to_list};", [])
+    rows
+  end
+
+  @doc """
+    Returns a Map containing the properties of the weather model specified
+    by *id* loaded from the database
+  """
+  def weather(id) when is_integer(id) or is_binary(id) do
+    %Postgrex.Result{num_rows: 1, rows: [{id, user_id, name, description, code, workspace}]} = Postgrex.Connection.query!(:conn, "SELECT id, user_id, name, description, code, workspace FROM weather WHERE id = " <> to_string(id), [])
+    %{id: id, user_id: user_id, name: name, description: description, code: code, workspace: workspace}
+  end
+
+  @doc """
+    Creates a new entry in the database with properties matching those supplied in
+    the Map *data*
+  """
+  def weather(nil, data) do
+    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO weather (user_id, name, description, code, workspace) VALUES (#{data.user_id}, '#{esc(data.name)}', '#{esc(data.description)}', '#{data.code}', '#{esc(data.workspace)}');", [])
+    %Postgrex.Result{rows: [{id}]} = Postgrex.Connection.query!(:conn, "SELECT currval(pg_get_serial_sequence('weather', 'id'));", [])
+    id
+  end
+
+  @doc """
+    Updates the database entry for the weather specified by *id* with
+    the values contained in the Map *data*.  Returns the weather's id.
+  """
+  def weather(id, data) do 
+    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "UPDATE weather SET name='#{esc(data.name)}', description='#{esc(data.description)}', code='#{esc(data.code)}', workspace='#{esc(data.workspace)}' WHERE id = #{id};", [])
+    id
+  end
+
+
+  @doc """
+    Lists the farms currently found in the database
+  """
+  def list_farms(last_id \\ 0) do
+    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT farms.id, farms.user_id, users.username, farms.name, farms.description FROM farms, users WHERE users.id = farms.user_id AND farms.id > #{last_id} ORDER BY farms.id LIMIT #{@rows_to_list};", [])
     rows
   end
 
@@ -54,8 +114,8 @@ defmodule Database do
     Returns the newly-created farm's id.
   """
   def farm(nil, data) do
-    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO farms (user_id, name, description, latitude, longitude, fields) VALUES (#{data.user_id}, '#{h(data.name)}', '#{h(data.description)}', '#{data.latitude}', '#{data.longitude}', '#{h(data.fields)}');", [])
-    %Postgrex.Result{rows: [{id}]} = Postgrex.Connection.query!(:conn, " SELECT currval(pg_get_serial_sequence('farms', 'id'));",[])
+    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO farms (user_id, name, description, latitude, longitude, fields) VALUES (#{data.user_id}, '#{esc(data.name)}', '#{esc(data.description)}', '#{data.latitude}', '#{data.longitude}', '#{esc(data.fields)}');", [])
+    %Postgrex.Result{rows: [{id}]} = Postgrex.Connection.query!(:conn, "SELECT currval(pg_get_serial_sequence('farms', 'id'));",[])
     id
   end
 
@@ -64,13 +124,14 @@ defmodule Database do
     values contained in the Map *data*.  Returns the farm's id.
   """
   def farm(id, data) do
-    Postgrex.Connection.query!(:conn, "UPDATE farms SET name='#{h(data.name)}', description='#{h(data.description)}', latitude=#{data.latitude}, longitude=#{data.longitude}, fields='#{h(data.fields)}' WHERE id = " <> to_string(id), [])
+    Postgrex.Connection.query!(:conn, "UPDATE farms SET name='#{esc(data.name)}', description='#{esc(data.description)}', latitude=#{data.latitude}, longitude=#{data.longitude}, fields='#{esc(data.fields)}' WHERE id = " <> to_string(id), [])
     id
   end
 
   # Escape strings
-  defp h(text) do
-    String.replace(text, "'", "''")
+  defp esc(text) do
+    text
+      |> String.replace("'", "''") 
   end
 
 end

@@ -20,7 +20,7 @@
  */
 
 /**
- * @fileoverview Farm Editor conrols for SmartFarm.
+ * @fileoverview Farm Editor controls for SmartFarm.
  * @author nhbean@ksu.edu (Nathan H. Bean)
  */
 jQuery(function(){

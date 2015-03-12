@@ -105,7 +105,7 @@ defmodule Farm do
     Updates a farm's field boundaries as a JSON object
   """
   def fields(farm, fields) do
-    Agent.update(farm, fn s -> model(s, fields: fields) end)
+    Agent.update(farm, fn s -> model(s, fields: to_string(fields)) end)
   end
 
 end

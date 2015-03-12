@@ -1,43 +1,45 @@
 defmodule User do
   @moduledoc """
-  Provides methods for creating and authenticating users
+    Provides methods for creating and authenticating users
   """
 
   # Caution: Changing the secret will invalidate all passwords
   @secret <<"SOME SECRET THIS IS!">>
 
   @doc """
-  Creates a new user with specified username and password 
-  Returns a tuple {status, message} where status is either :ok or :fail
-  Failure typically means the username is taken
+    Creates a new user with specified username and password 
+    Returns a tuple {status, message} where status is either :ok or :fail
+    Failure typically means the username is taken
   """
   def create(username, password, teacher) do
-    case check_for_username(username) do
-      :exists ->
-        {:fail, <<"Username ">> <> username <> <<" is already taken">>}
-      :unknown ->
-        salt = :crypto.rand_bytes(20) |> :base64.encode_to_string |> to_string
-        crypted_password = :crypto.hash(:md5, password <> @secret <> salt) |> :base64.encode_to_string |> to_string
-        IO.puts to_string "INSERT INTO users (username, crypted_password, salt) VALUES ('" <> username <> "','" <> crypted_password <> "','" <> salt <>"')"
-        Postgrex.Connection.query!(:conn, "INSERT INTO users (username, crypted_password, salt, teacher) VALUES ('" <> username <> "','" <> crypted_password <> "','" <> salt <>"'," <> teacher <> ")", [])
-        {:ok, <<"User ">> <> username <> <<" created">>}
+    if Database.username_available?(username) do
+      salt = :crypto.rand_bytes(20) |> :base64.encode_to_string |> to_string
+      crypted_password = :crypto.hash(:md5, password <> @secret <> salt) |> :base64.encode_to_string |> to_string
+      if teacher do
+        role = 1
+      else
+        role = 0
+      end
+      Database.user(nil, %{username: username, salt: salt, crypted_password: crypted_password, role: role})
+      {:ok, <<"Logged in as ">> <> username}
+    else
+      {:fail, <<"Username ">> <> username <> <<" is already taken">>}
     end
   end
 
   @doc """
-  Authenticates a user
+    Authenticates a user.  Returns {:ok, *id*, *message*, *username*} if successful, or {:fail, *message*}.
   """
   def authenticate(username, password) do
     username = username |> to_string
     password = password |> to_string
-    result = Postgrex.Connection.query!(:conn, "SELECT id, crypted_password, salt FROM users WHERE username='" <> username <> "'", [])
-    if result.num_rows == 0 do
+    if Database.username_available?(username) do 
       {:fail, :undefined, <<"Could not find that username and password combination.  Please try again.">>}
     else
-      [{id, crypted_password, salt} | _tail] = result.rows
-      test_password = :crypto.hash(:md5, password <> @secret <> salt) |> :base64.encode_to_string |> to_string
-      if test_password == crypted_password do
-        {:ok, id, <<"Logged in as ">> <> username}
+      user = Database.user_with_username(username)
+      test_password = :crypto.hash(:md5, password <> @secret <> user.salt) |> :base64.encode_to_string |> to_string
+      if test_password == user.crypted_password do
+        {:ok, user.id, <<"Logged in as ">> <> username}
       else
         {:fail, <<"Could not find that username and password combination.  Please try again.">>}
       end
@@ -45,30 +47,11 @@ defmodule User do
   end
 
   @doc """
-    Returns the username for user with specified id
+    Returns the username of the user specified by *id*
   """
-  def username(:undefined) do
-    <<"Undefined">>
-  end
   def username(id) do
-    %Postgrex.Result{rows: [{username}], num_rows: 1} = Postgrex.Connection.query!(:conn, "SELECT username FROM users WHERE id=#{id};",[])
-    username
+    user = Database.user(id)
+    user.username
   end
-    
-
-  @doc """
-  Checks to see if the supplied username is taken.
-  Returns :exists or :unknown
-  """  
-  defp check_for_username(username) do
-    result = Postgrex.Connection.query!(:conn, "SELECT id FROM users WHERE username='" <> username <> "'", [])
-    if result.num_rows == 0 do
-      :unknown
-    else
-      :exists
-    end
-  end
-
- 
 
 end

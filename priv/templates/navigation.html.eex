@@ -21,6 +21,12 @@
         <% else %>
           <li><a href="/simulations">Simulations</a></li>
         <% end %>
+
+        <%= if controller == :farms do %>
+          <li class="active"><a href="/farms">Farms</a></li>
+        <% else %>
+          <li><a href="/farms">Farms</a></li>
+        <% end %>
         
         <%= if controller == :weather do %>
           <li class="active"><a href="/weather">Weather Models</a></li>

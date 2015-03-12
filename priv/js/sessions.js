@@ -36,6 +36,7 @@ $(function(){
       method: "POST",
       data: {username: username, password: password},
       success: function(data) {
+console.log(data);
         $('#login-dialog').modal('hide');
         $('#session-message').html(data);
         $('.logged-in').show();

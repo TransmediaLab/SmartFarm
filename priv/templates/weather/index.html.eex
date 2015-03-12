@@ -1,0 +1,47 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-3"></div>
+    <div class="col-sm-9">
+      <h1>Weather Models</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-3">
+      <div class="well">
+        <h4>Search<h4>
+        <div class="input-group input-group-sm">
+          <input id="search" type="text" class="form-control" placeholder="Search for ..." />
+          <div class="input-group-btn">
+            <button class="btn btn-default" type="button">
+              <span class="glyphicon glyphicon-search"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <h4>Filter</h4>
+      <div class="checkbox">
+        <label>
+          <input id="filter-mine" type="checkbox">My Weather Models
+        </label>
+      </div>
+    </div>
+    <div class="col-sm-9">
+      <p>
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        Weather Models provide the day-to-day weather for a simulation. 
+        They can be based on historical measurements, statistical models
+        built from such measurements, or randomly generated.  In addition
+        to weather models intended to capture normal weather, specialized
+        weather models can be used to examine the effects of climate change.
+      </p>
+      <p>
+        You can use one of the Weather Models below in your simulation, or
+        you can <a href="/weather/new">create your own</a>.
+      </p>
+      <div id="search-results">
+        <%= models %>
+        <a href="#" id="load-more-weather">Load more weather models</a>
+      </div>
+    </div>
+  </div>
+</div>

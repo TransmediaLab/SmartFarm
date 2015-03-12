@@ -1,5 +1,36 @@
 <div class="container">
-  <h1>Farms</h1>
-  <p>You can select one of the farms below, or <a href="/farms/new">create your own</a></p>
-  <%= farms %>
+  <div class="row">
+    <div class="col-sm-3"></div>
+    <div class="col-sm-9">
+      <h1>Farms</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-3">
+      <div class="well">
+        <h4>Search</h4>
+        <div class="input-group input-group-sm">
+          <input id="search" type="text" class="form-control" placeholder="Search for..." />
+          <div class="input-group-btn">
+            <button class="btn btn-default" type="button">
+              <span class="glyphicon glyphicon-search"></span>
+            </button>
+          </div>
+        </div>
+        <h4>Filter</h4>
+        <div class="checkbox">
+          <label>
+            <input id="filter-mine" type="checkbox">My Farms
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-9">
+      <p>You can select one of the farms below, or <a href="/farms/new">create your own</a></p>
+      <div id="search-results">
+        <%= farms %>
+        <a href="#" id="load-more-farms">Load more farms</a>
+      </div>
+    </div>
+  </div>
 </div>
