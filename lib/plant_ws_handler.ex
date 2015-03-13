@@ -1,7 +1,7 @@
-defmodule WeatherWebSocketHandler do
+defmodule PlantWebSocketHandler do
   @moduledoc """
     This module upgrades an HTTP connection to a WebSocket that manages
-    a SmartFarm simulation.  
+    a SmartFarm plant model editing session.  
     
     Because JavaScript measures time in milliseconds since 1/1/1970, we will
     use that representation for simulation time as well.
@@ -19,8 +19,8 @@ defmodule WeatherWebSocketHandler do
 
   EEx.function_from_file :defp, :html_weather_status, "priv/templates/weather_status.html.eex", [:weather, :date]
 
-  # A record to represent the simulation state
-  Record.defrecord :state, user_id: nil, paused: :true, time: 0, start: 0, weather: nil
+  # A record to represent the plant editor state
+  Record.defrecord :state, user_id: nil, paused: :true, time: 0, start: 0, weather: nil, plant: nil
 
   @doc"""
   Initialize the websocket server and set up the inital simulation state
@@ -29,23 +29,23 @@ defmodule WeatherWebSocketHandler do
     # Get the user id for the signed-in user
     user_id = Keyword.get opts, :user_id
 
-    # Load the appropriate weather_model
-    weather_id = Keyword.get(opts, :id)
-    case weather_id do
+    # Load the appropriate plant model
+    plant_id = Keyword.get(opts, :id)
+    case plant_id do
       "new" ->
-         weather = Weather.new(user_id)
+         plant = Plant.new(user_id)
       _ ->
-         weather = Weather.load(weather_id)
+         plant = Plant.load(plant_id)
     end
-    # Send the client the weather
-    :erlang.send self(), :weather
+    # Send the client the plant
+    :erlang.send self(), :plant
 
     # Set the simulation start time to right now
     {mega, sec, _micro} = :erlang.now
     start = (mega * 1000000 + sec) * 1000
 
     req = :cowboy_req.compact req
-    format_ok req, state(user_id: user_id, start: start, time: start, weather: weather)
+    format_ok req, state(user_id: user_id, start: start, time: start, plant: plant)
   end
 
 
@@ -62,7 +62,7 @@ defmodule WeatherWebSocketHandler do
     change-code		| text/json {workspace : <Blockly workspace as xml string>, code: <JavaScript code equivalent>}
 
   """  
-  def websocket_handle({:text, msg}, req, state(user_id: user_id, weather: weather)=state) do
+  def websocket_handle({:text, msg}, req, state(user_id: user_id, plant: plant)=state) do
     json = Poison.decode! msg
     case json["type"] do
 
@@ -80,6 +80,7 @@ defmodule WeatherWebSocketHandler do
           format_reply(req, reply, state(state, paused: true, time: start))
 
       "step" ->
+IO.puts "STEP"
           :erlang.send self(), :step
           format_ok(req, state)
 
@@ -87,16 +88,16 @@ defmodule WeatherWebSocketHandler do
          if user_id == :undefined do
            format_reply(req, "{\"type\":\"not-logged-in\"}", state)
          else
-           if to_string(Weather.user_id(weather)) == user_id do
-             id = Weather.save(weather)
+           if to_string(Plant.user_id(plant)) == user_id do
+             id = Plant.save(plant)
            else
-             id = Weather.clone(weather, user_id)
+             id = Plant.clone(plant, user_id)
            end
            format_reply(req, "{\"type\":\"new-id\",\"data\":#{id}}", state)
          end
 
       "change-code" ->
-          Weather.change_code(weather, json["data"]["workspace"], json["data"]["code"])
+          Plant.change_code(plant, json["data"]["code"], json["data"]["workspace"])
           format_ok(req, state)
 
       msg ->
@@ -116,18 +117,25 @@ defmodule WeatherWebSocketHandler do
     defined in the simulation.  It also schedules the next simulation step unless
     the simulation is currently paused, and sends the client an updated time.
   """
-  def websocket_info(:step, req, state(time: time, paused: paused, weather: weather)=state) do
-
+  def websocket_info(:step, req, state(time: time, paused: paused, weather: weather, plant: plant)=state) do
+IO.puts "time"
     # advance simulation by one day
     time = time + 86400000 
+    simState = [simulation_time: time]
 
-    # advance the weather model
-    Weather.tick(weather, [simulation_time: time])
+    # advance the weather model (if in use)
+    if(weather != nil) do
+      Weather.tick(weather, simState)
+      simState = Keyword.merge(Weather.state(weather), simState)
+    end
+
+    # advance the plant model
+    Plant.tick(plant, simState)
 
     # schedule next update
     if !paused do :erlang.send_after @step_delay, self(), :step end
 
-    reply = %{type: "state", data: Weather.state(weather)}
+    reply = %{type: "state", data: %{simulation_time: time, plants: [Plant.state(plant)]}}
       |> Poison.encode!
       |> to_string
 
@@ -136,10 +144,10 @@ defmodule WeatherWebSocketHandler do
 
 
   @doc """
-    Sends the weather model data to the client
+    Sends the plant model data to the client
   """
-  def websocket_info(:weather, req, state(weather: weather)=state) do
-    reply = %{type: "weather", data: Weather.model_data(weather)}
+  def websocket_info(:plant, req, state(plant: plant)=state) do
+    reply = %{type: "plant", data: Plant.model_data(plant)}
       |> Poison.encode!
       |> to_string
     format_reply req, reply, state

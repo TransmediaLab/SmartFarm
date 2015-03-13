@@ -7,9 +7,10 @@ defmodule WeatherHandler do
   require Weather
 
   # HTML page template functions
-  EEx.function_from_file :defp, :weather_index, "priv/templates/weather/index.html.eex", [:models]
+  EEx.function_from_file :defp, :weather_index, "priv/templates/weather/index.html.eex", [:models, :user_filters]
   EEx.function_from_file :defp, :weather_edit,  "priv/templates/weather/edit.html.eex",  []
   EEx.function_from_file :defp, :weather_model, "priv/templates/weather/model.html.eex", [:id, :user_id, :username, :name, :description]
+  EEx.function_from_file :defp, :filter,	"priv/templates/search/user_filter.html.eex", [:user_id, :username]
 
   @doc """
     Initializes the http handler
@@ -25,17 +26,28 @@ defmodule WeatherHandler do
     {user_id, req} = :cowboy_req.cookie(<<"userid">>, req, nil)
     {id, req} = :cowboy_req.binding(:id, req, :all)
     case id do 
-      :all ->         
-         #%Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT id, name, description FROM weather;", [])
-         content = Database.list_weather
-         |> Enum.map(fn {id, user_id, username, name, desc} -> weather_model(id, user_id, username, name, desc) end)
-         |> weather_index
-         options = [
-           title: <<"Weather Models">>,
-           controller: :weather,
-           user_id: user_id
-         ]
-         {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.page(content, options), req
+      :all ->
+         {xhr, req} = :cowboy_req.header(<<"x-requested-with">>, req)
+         if(xhr == "XMLHttpRequest") do
+           {query, req} = :cowboy_req.qs_vals(req)
+           reply = Database.list_weather(query, 0)
+             |> Enum.map(fn {id, user_id, username, name, desc} -> weather_model(id, user_id, username, name, desc) end)
+           {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], reply, req
+         else
+           user_filters = [{user_id, Database.user(user_id).username}]
+             |> Enum.map(fn {uid, uname} -> filter(uid, uname) end)
+             |> Enum.join
+           content = Database.list_weather
+             |> Enum.map(fn {id, user_id, username, name, desc} -> weather_model(id, user_id, username, name, desc) end)
+             |> weather_index(user_filters)
+           options = [
+             title: <<"Weather Models">>,
+             controller: :weather,
+             user_id: user_id,
+             scripts: ["js/search.js"]
+           ]
+           {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.page(content, options), req
+         end
       _ ->
          content = weather_edit()
          options = [
@@ -45,8 +57,7 @@ defmodule WeatherHandler do
            blockly: true,
            scripts: ["/js/weather_editor.js"]
          ]
-         {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.page(content, options), req
-         
+         {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.page(content, options), req        
     end
     {:ok, req, state}
   end

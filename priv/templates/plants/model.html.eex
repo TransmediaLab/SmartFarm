@@ -1,6 +1,7 @@
-<div id=<%= id %> class="plant">
-  <a href="/plants/<%= id %>"><%= name %></a>
-  <div>
+<div id=<%= id %> class="search-result">
+  <a class="title" href="/plants/<%= id %>"><%= name %></a>
+  <a class="owner" href="/users/<%= user_id %>"><%= username %></a>
+  <p class="description">
     <%= description %>
-  </div>
+  </p>
 </div>

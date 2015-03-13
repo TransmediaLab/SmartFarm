@@ -15,8 +15,9 @@ defmodule SmartfarmServer do
         {'/weather[/:id]', WeatherHandler, []},
         {'/weather/:id/ws', WeatherWebSocketHandler, []},
         {'/plants[/:id]', PlantHandler, []},
-        {'/farms/:id/ws', FarmWebSocketHandler, []},
+        {'/plants/:id/ws', PlantWebSocketHandler, []},
         {'/farms[/:id]', FarmHandler, []},
+        {'/farms/:id/ws', FarmWebSocketHandler, []},
         {'/simulations[/:id]', SimulationHandler, []},
         {'/simulation_ws', SimulationWebSocketHandler, []},
         {'/',    HelloHandler, []}

@@ -13,25 +13,66 @@ defmodule Plant do
   require Record
 
   # A record for the plant agent model
-  Record.defrecordp :model, :plant, id: nil, user_id: nil, code: "", workspace: "", population: []
+  Record.defrecordp :model, :plant, id: nil, user_id: nil, name: "Unnamed Plant", description: "", code: "", workspace: "", population: []
 
   @doc """
     Loads a plant model from the database and returns a plant agent
   """
   def load(id) do
-    %Postgrex.Result{num_rows: 1, rows: [{user_id, code, workspace}]} = Postgrex.Connection.query!(:conn, "SELECT user_id, code, workspace FROM plants WHERE id = " <> to_string(id), [])
-    {:ok, plant} = Agent.start_link(fn -> model(id: id, user_id: user_id, code: code, workspace: workspace, population: []) end)
+    data = Database.plant(id)
+    {:ok, agent} = Agent.start_link(fn -> model(id: id, user_id: data.user_id, name: data.name, description: data.description, workspace: data.workspace, code: data.code) end)
+    agent
+  end
+
+  @doc """
+    Creates a new plant model agent for the specified user
+  """
+  def new(user_id) do
+    {:ok, plant} = Agent.start_link(fn -> model(user_id: user_id) end)
     plant
   end
 
   @doc """
-    Starts a new plant.
+    Saves the current plant model and returns its id.
   """
-  def new(user_id) do
-    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO plants (user_id) VALUES (#{user_id});", [])
-    %Postgrex.Result{rows: [{id}]} = Postgrex.Connection.query!(:conn, " SELECT currval(pg_get_serial_sequence('plants', 'id'));",[])
-    load id
+  def save(plant) do
+    model(id: id, user_id: user_id, name: name, description: description, code: code, workspace: workspace) = Agent.get(plant, fn s -> s end)
+    id = Database.plant(id, %{user_id: user_id, name: name, description: description, code: code, workspace: workspace})
   end
+
+  @doc """
+    Clones the current plant model for the specified user, saves the clone
+    to the database, and returns its id.
+  """
+  def clone(plant, user_id) do
+    Agent.update(plant, fn s -> model(s, id: nil, user_id: user_id) end)
+    save(plant)
+  end
+
+  @doc """
+    Returns the plant model's user_id
+  """
+  def user_id(plant) do
+    Agent.get(plant, fn model(user_id: user_id) -> user_id end)
+  end
+
+  @doc """
+    Returns the plant model as a Map
+  """
+  def model_data(plant) do
+    {name, description, code, workspace} = Agent.get(plant, fn model(name: name, description: description, code: code, workspace: workspace) -> {name, description, code, workspace} end)
+    %{name: name, description: description, code: code, workspace: workspace}
+  end
+
+  @doc """
+    Returns the current state of the plant model as a Map
+  """
+  def state(plant) do
+    Agent.get(plant, fn model(population: pop) -> pop end)
+      |> Enum.map fn p -> Enum.into p, %{} end
+  end
+
+
 
   @doc """
     Changes the code for the specified plant model.
@@ -41,21 +82,13 @@ defmodule Plant do
   end
 
   @doc """
-    Saves the current plant model for the current user. 
-    If this is the plant model's owner, the current database entry is overwritten.
-    Otherwise, a clone of the plant is created.
+    Returns the Blockly workspace for the plant model.
   """
-  def save(plant, current_user_id) do
-    {id, user_id, code, workspace} = Agent.get(plant, fn model(id: id, user_id: user_id, code: code, workspace: workspace) -> {id, user_id, code, workspace} end)
-    if current_user_id == to_string(user_id) do
-      Postgrex.Connection.query!(:conn, "UPDATE plants SET code='#{code}', workspace='#{workspace}' WHERE id=#{id}", [])
-    else
-      %Postgrex.Result{num_rows: 1, rows: [{name, description}]} = Postgrex.Connection.query!(:conn, "SELECT name, description FROM plants WHERE id=#{id}", [])
-      %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO plants (user_id, name, description, code, workspace) VALUES (#{current_user_id}, '#{name}', '#{description}', '#{code}', '#{workspace}');", [])
-      %Postgrex.Result{rows: [{id}]} = Postgrex.Connection.query!(:conn, " SELECT currval(pg_get_serial_sequence('plants', 'id'));",[])  
-      Agent.update(plant, fn s -> model(s, id: id, user_id: current_user_id) end)
-    end
+  def workspace(plant) do
+    Agent.get(plant, fn model(workspace: workspace) -> workspace end) |> String.replace("\"", "\\\"")
   end
+
+
 
   @doc """
     Establishes a new plant in the population at location {x, y}
@@ -63,13 +96,6 @@ defmodule Plant do
   def sow(plant, {x,y}) do
     seed = [x: x, y: y, biomass: 1] 
     Agent.update(plant, fn model(code: code, population: population)=m -> model(m, population: [seed|population]) end)
-  end
-
-  @doc """
-    Returns the Blockly workspace for the plant model.
-  """
-  def workspace(plant) do
-    Agent.get(plant, fn model(workspace: workspace) -> workspace end) |> String.replace("\"", "\\\"")
   end
 
   @doc """
@@ -87,18 +113,18 @@ defmodule Plant do
   @doc """
     Advances the modeled plant population by one day
   """
-  def tick(plant) do
-    Agent.update(plant, fn model(code: code, population: pop)=m -> model(m, population: tick_helper(pop, code)) end)
+  def tick(plant, state) do
+    Agent.update(plant, fn model(code: code, population: pop)=m -> model(m, population: tick_helper(pop, state, code)) end)
   end
 
   # Tick helper recurses through the population, updating it with supplied code
-  defp tick_helper([], code) do
+  defp tick_helper([], _state, _code) do
     []
   end
 
-  defp tick_helper([head|tail], code) do
-    {_, new_state} = Code.eval_string(code, head)
-    [new_state|tick_helper(tail, code)]
+  defp tick_helper([head|tail], state, code) do
+    {_, new_state} = Code.eval_string(code, Keyword.merge(head, state))
+    [new_state|tick_helper(tail, state, code)]
   end
 
 end

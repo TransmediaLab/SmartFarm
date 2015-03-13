@@ -1,0 +1,6 @@
+<div class="checkbox">
+  <label>
+    <input class="user-filter" type="checkbox" value="<%= user_id %>">
+    <%= username %>
+  </label>
+</div>

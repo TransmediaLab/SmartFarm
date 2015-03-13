@@ -16,7 +16,7 @@ defmodule Weather do
   """
   def load(id) do
     data = Database.weather(id)
-    {:ok, agent} = Agent.start_link(fn -> model(id: id, user_id: data.user_id, workspace: data.workspace, code: data.code) end)
+    {:ok, agent} = Agent.start_link(fn -> model(id: id, user_id: data.user_id, name: data.name, description: data.description, workspace: data.workspace, code: data.code) end)
     agent
   end
 
@@ -46,7 +46,7 @@ defmodule Weather do
   end
 
   @doc """
-    Returns the weather model as a JSON string
+    Returns the weather model as a Map
   """
   def model_data(weather) do
     {name, description, code, workspace} = Agent.get(weather, fn model(name: name, description: description, code: code, workspace: workspace) -> {name, description, code, workspace} end)
@@ -59,11 +59,6 @@ defmodule Weather do
   def user_id(weather) do
     Agent.get(weather, fn model(user_id: user_id) -> user_id end)
   end
-
-  def weather_model(weather) do 
-    Agent.get(weather, fn s -> s end)
-  end
-
 
   @doc """
     Returns the current state of the weather model as a Map
