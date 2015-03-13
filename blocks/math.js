@@ -168,8 +168,10 @@ Blockly.Blocks['math_constant'] = {
          ['e', 'E'],
          ['\u03c6', 'GOLDEN_RATIO'],
          ['sqrt(2)', 'SQRT2'],
-         ['sqrt(\u00bd)', 'SQRT1_2'],
-         ['\u221e', 'INFINITY']];
+         ['sqrt(\u00bd)', 'SQRT1_2']
+       ];
+       /* Removed infinity, as Erlang (and hence, Elixir) has no such concept */
+       /*['\u221e', 'INFINITY'] */
     this.setHelpUrl(Blockly.Msg.MATH_CONSTANT_HELPURL);
     this.setColour(230);
     this.setOutput(true, 'Number');

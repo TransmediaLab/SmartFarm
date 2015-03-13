@@ -115,11 +115,14 @@ Blockly.Elixir.init = function(workspace) {
 };
 
 /**
+ * Prepend the generated code with a command to seed the
+ * random number generator.
  * Prepend the generated code with the variable definitions.
  * @param {string} code Generated code.
  * @return {string} Completed code.
  */
 Blockly.Elixir.finish = function(code) {
+  code = ':random.seed(:os.timestamp)\n\n' + code;
   // Convert the definitions dictionary into a list.
   var definitions = [];
   for (var name in Blockly.Elixir.definitions_) {

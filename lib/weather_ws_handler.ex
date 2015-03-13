@@ -59,6 +59,9 @@ defmodule WeatherWebSocketHandler do
     pause		| none
     reset		| none
     step 		| none
+    name		| text
+    description		| text
+    save		| none
     change-code		| text/json {workspace : <Blockly workspace as xml string>, code: <JavaScript code equivalent>}
 
   """  
@@ -81,6 +84,14 @@ defmodule WeatherWebSocketHandler do
 
       "step" ->
           :erlang.send self(), :step
+          format_ok(req, state)
+
+      "name" ->
+          Weather.name(weather, json["data"])
+          format_ok(req, state)
+      
+      "description" ->
+          Weather.description(weather, json["data"])
           format_ok(req, state)
 
       "save" ->

@@ -55,7 +55,7 @@ Blockly.Elixir['math_arithmetic'] = function(block) {
   var code;
   // Power in Elixir requires a special case since it has no operator.
   if (!operator) {
-    code = 'Math.pow(' + argument0 + ', ' + argument1 + ')';
+    code = ':math.pow(' + argument0 + ', ' + argument1 + ')';
     return [code, Blockly.Elixir.ORDER_FUNCTION_CALL];
   }
   code = argument0 + operator + argument1;
@@ -97,6 +97,9 @@ Blockly.Elixir['math_single'] = function(block) {
     case 'LN':
       code = ':math.log(' + arg + ')';
       break;
+    case 'LOG10':
+      code = ':math.log10(' + arg + ')';
+      break;
     case 'EXP':
       code = ':math.exp(' + arg + ')';
       break;
@@ -113,13 +116,13 @@ Blockly.Elixir['math_single'] = function(block) {
       code = 'round((' + arg + ' - 0.5))';
       break;
     case 'SIN':
-      code = ':math.sin(' + arg + ' / 180 * Math.PI)';
+      code = 'Float.round(:math.sin(' + arg + ' / 180.0 * :math.pi),15)';
       break;
     case 'COS':
-      code = ':math.cos(' + arg + ' / 180 * Math.PI)';
+      code = 'Float.round(:math.cos(' + arg + ' / 180.0 * :math.pi),15)';
       break;
     case 'TAN':
-      code = ':math.tan(' + arg + ' / 180 * Math.PI)';
+      code = ':math.tan(' + arg + ' / 180.0 * :math.pi)';
       break;
   }
   if (code) {
@@ -128,17 +131,14 @@ Blockly.Elixir['math_single'] = function(block) {
   // Second, handle cases which generate values that may need parentheses
   // wrapping the code.
   switch (operator) {
-    case 'LOG10':
-      code = ':math.log(' + arg + ') / :math.log(10)';
-      break;
     case 'ASIN':
-      code = ':math.asin(' + arg + ') / :math.PI * 180';
+      code = ':math.asin(' + arg + ') / :math.PI * 180.0';
       break;
     case 'ACOS':
-      code = 'Math.acos(' + arg + ') / Math.PI * 180';
+      code = ':math.acos(' + arg + ') / :math.pi * 180.0';
       break;
     case 'ATAN':
-      code = 'Math.atan(' + arg + ') / Math.PI * 180';
+      code = ':math.atan(' + arg + ') / :math.pi * 180.0';
       break;
     default:
       throw 'Unknown math operator: ' + operator;
@@ -149,13 +149,12 @@ Blockly.Elixir['math_single'] = function(block) {
 Blockly.Elixir['math_constant'] = function(block) {
   // Constants: PI, E, the Golden Ratio, sqrt(2), 1/sqrt(2), INFINITY.
   var CONSTANTS = {
-    'PI': ['Math.PI', Blockly.Elixir.ORDER_MEMBER],
-    'E': ['Math.E', Blockly.Elixir.ORDER_MEMBER],
+    'PI': [':math.pi', Blockly.Elixir.ORDER_MEMBER],
+    'E': ['2.718281828459045', Blockly.Elixir.ORDER_MEMBER],
     'GOLDEN_RATIO':
-        ['(1 + Math.sqrt(5)) / 2', Blockly.Elixir.ORDER_DIVISION],
-    'SQRT2': ['Math.SQRT2', Blockly.Elixir.ORDER_MEMBER],
-    'SQRT1_2': ['Math.SQRT1_2', Blockly.Elixir.ORDER_MEMBER],
-    'INFINITY': ['Infinity', Blockly.Elixir.ORDER_ATOMIC]
+        ['(1 + :math.sqrt(5)) / 2', Blockly.Elixir.ORDER_DIVISION],
+    'SQRT2': ['1.4142135623730951', Blockly.Elixir.ORDER_MEMBER],
+    'SQRT1_2': ['0.7071067811865476', Blockly.Elixir.ORDER_MEMBER]
   };
   return CONSTANTS[block.getFieldValue('CONSTANT')];
 };
@@ -380,9 +379,9 @@ Blockly.Elixir['math_constrain'] = function(block) {
   var argument1 = Blockly.Elixir.valueToCode(block, 'LOW',
       Blockly.Elixir.ORDER_COMMA) || '0';
   var argument2 = Blockly.Elixir.valueToCode(block, 'HIGH',
-      Blockly.Elixir.ORDER_COMMA) || 'Infinity';
-  var code = 'Math.min(Math.max(' + argument0 + ', ' + argument1 + '), ' +
-      argument2 + ')';
+      Blockly.Elixir.ORDER_COMMA) || '0';
+  var code = 'Enum.min([Enum.max([' + argument0 + ', ' + argument1 +']),' +
+      arguement2 + '])';
   return [code, Blockly.Elixir.ORDER_FUNCTION_CALL];
 };
 
@@ -392,23 +391,11 @@ Blockly.Elixir['math_random_int'] = function(block) {
       Blockly.Elixir.ORDER_COMMA) || '0';
   var argument1 = Blockly.Elixir.valueToCode(block, 'TO',
       Blockly.Elixir.ORDER_COMMA) || '0';
-  var functionName = Blockly.Elixir.provideFunction_(
-      'math_random_int',
-      [ 'function ' + Blockly.Elixir.FUNCTION_NAME_PLACEHOLDER_ +
-          '(a, b) {',
-        '  if (a > b) {',
-        '    // Swap a and b to ensure a is smaller.',
-        '    var c = a;',
-        '    a = b;',
-        '    b = c;',
-        '  }',
-        '  return Math.floor(Math.random() * (b - a + 1) + a);',
-        '}']);
-  var code = functionName + '(' + argument0 + ', ' + argument1 + ')';
+  var code = argument0 + ' + :random.uniform(' + argument1 + ' - ' + argument0 + ')';
   return [code, Blockly.Elixir.ORDER_FUNCTION_CALL];
 };
 
 Blockly.Elixir['math_random_float'] = function(block) {
   // Random fraction between 0 and 1.
-  return ['Math.random()', Blockly.Elixir.ORDER_FUNCTION_CALL];
+  return [':random.uniform()', Blockly.Elixir.ORDER_FUNCTION_CALL];
 };

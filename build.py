@@ -384,7 +384,7 @@ class Gen_langfiles(threading.Thread):
           '--source_lang_file', os.path.join('msg', 'json', 'en.json'),
           '--source_synonym_file', os.path.join('msg', 'json', 'synonyms.json'),
           '--key_file', os.path.join('msg', 'json', 'keys.json'),
-          '--output_dir', os.path.join('msg', 'js'),
+          '--output_dir', os.path.join('priv', 'js', 'msg', 'js'),
           '--quiet']
       json_files = glob.glob(os.path.join('msg', 'json', '*.json'))
       json_files = [file for file in json_files if not

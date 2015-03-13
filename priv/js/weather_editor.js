@@ -67,6 +67,8 @@ jQuery(function() {
       case "weather":
         var xml = Blockly.Xml.textToDom(msg.data.workspace);
         Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+        $('#weather-name').val(msg.data.name);
+        $('#weather-description').val(msg.data.description);
         break;
       case "state":
         updateTime(msg.data.simulation_time);
@@ -75,6 +77,21 @@ jQuery(function() {
     }
   }
 
+  $('#weather-name').on('change', function() {
+    var msg = {
+      'type': 'name',
+      'data': $('#weather-name').val()
+    }
+    ws.send(JSON.stringify(msg));
+  });
+ 
+  $('#weather-description').on('change', function() {
+    var msg = {
+      'type': 'description',
+      'data': $('#weather-description').val()
+    }
+    ws.send(JSON.stringify(msg));
+  });
 
 
   $('#run').prop('disabled', false)
@@ -139,7 +156,8 @@ jQuery(function() {
         html += ' <i class="wi wi-celsius"></i>';
       else
         html += ' <i class="wi wi-fahrenheit"></i>';
-      html += ' <i class="wi wi-sprinkles"></i>' + ((priorState.weather_rainfall ? priorState.weather_rainfall : 0) + (priorState.weather_snowfall ? priorState.weather_snowfall : 0)) + ' inches'; 
+      html += ' <i class="wi wi-sprinkles"></i>' + ((priorState.weather_rainfall ? priorState.weather_rainfall : 0) + (priorState.weather_snowfall ? priorState.weather_snowfall : 0)) + ' mm'; 
+      html += ' <i class="wi wi-wind"></i>' + formatValue(priorState.weather_wind_speed) + 'm/s';
       $('#weather-history').prepend('<li class="list-group-item">' + html + '</li>');
     }
 
@@ -169,15 +187,15 @@ jQuery(function() {
     
     info += formatTemperature(state.weather_average_temperature);
     if(tempMeasure == "C")
-      info += '<i class="wi wi-celcius"></i>';
+      info += '<i class="wi wi-celsius"></i>';
     else
       info += '<i class="wi wi-fahrenheit"></i>';        
-    
+
     $('#weather-info').html(info);
 
     $('#weather-precipitation').html("Precipitation: " + precipitation + " mm");
     $('#weather-humidity').html("Humidity: " + formatValue(state.weather_humidity) + "%");
-    $('#weather-wind').html("Wind: " + formatValue(state.weather_wind_speed) + "mph");
+    $('#weather-wind').html("Wind: " + formatValue(state.weather_wind_speed) + "m/s");
     
   }
 
@@ -196,12 +214,12 @@ jQuery(function() {
 
 
   function formatValue(value) {
-    if(value) return value;
+    if(jQuery.isNumeric(value)) return value;
     else return "?";
   }
 
   function formatTemperature(temperature) {
-    if(temperature) {
+    if(jQuery.isNumeric(temperature)) {
       if(tempMeasure == 'C') return temperature;
       else return (temperature *(9.0/5.0) + 32);
     } else return "?";

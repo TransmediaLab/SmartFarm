@@ -94,4 +94,32 @@ defmodule Weather do
     Agent.update(weather, fn m -> model(m, state: new_state) end)
   end
 
+  @doc """
+    Returns the weather model's name
+  """
+  def name(weather) do
+    Agent.get(weather, fn model(name: name) -> name end)
+  end
+
+  @doc """
+    Sets the weather model's name to *name*
+  """
+  def name(weather, name) do
+    Agent.update(weather, fn m -> model(m, name: name) end)
+  end
+
+  @doc """
+    Gets the weather model's description
+  """
+  def description(weather) do
+    Agent.get(weather, fn model(description: description) -> description end)
+  end
+
+  @doc """
+    Sets the weather model's description to *description*
+  """
+  def description(weather, description) do
+    Agent.update(weather, fn m -> model(m, description: description) end)
+  end
+
 end
