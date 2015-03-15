@@ -5,7 +5,8 @@ defmodule Database do
   @rows_to_list 200
 
   def init do
-    {:ok, pid} = Postgrex.Connection.start_link(hostname: "localhost", username: "smartfarm", password: "smartFARMING", database: "smartfarm_#{Mix.env}")
+    #{:ok, pid} = Postgrex.Connection.start_link(hostname: "localhost", username: "smartfarm", password: "smartFARMING", database: "smartfarm_#{Mix.env}")
+    {:ok, pid} = Postgrex.Connection.start_link(hostname: "localhost", username: "smartfarm", password: "smartFARMING", database: "smartfarm_dev")
     Process.register(pid, :conn)
   end
 

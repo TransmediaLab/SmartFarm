@@ -24,12 +24,15 @@ defmodule SmartfarmServer do
         {'/', FarmHandler, []}
       ]}
     ])
+
+    Database.init
+    IO.puts "Connected to database..."
+
     :cowboy.start_http :my_http_listener, 100, [{:port, 80}], [{:env, [{:dispatch, dispatch}]}]
     IO.puts "Started listening on port 80..."
 
-    Database.init
-
-    WebSocketSup.start_link
+    #SmartFarmSup.start_link
+    SmartFarmSup.start_link()
   end
 
   def stop(_state) do

@@ -13,7 +13,7 @@ defmodule SmartFarm.Mixfile do
   # Configuration for the OTP application
   def application do
     [
-      applications: [:ranch, :crypto, :cowboy, :gproc],
+      applications: [:ranch, :crypto, :cowboy, :gproc, :poison, :postgrex],
       mod: {SmartfarmServer, []},
     ]
   end
@@ -23,7 +23,8 @@ defmodule SmartFarm.Mixfile do
       {:cowboy, github: "extend/cowboy"},
       {:gproc, github: "esl/gproc"},
       {:poison, github: "devinus/poison"},
-      {:postgrex, "~> 0.6"}
+      {:postgrex, "~> 0.6"},
+      {:exrm, "~> 0.14.2"}
     ]
   end
 end
