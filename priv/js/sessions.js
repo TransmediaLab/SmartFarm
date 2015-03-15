@@ -38,6 +38,7 @@ $(function(){
       data: {username: username, password: password},
       success: function(data) {
         $('#login-dialog').modal('hide');
+        $('#login-message').html('');
         $('#session-message').html(data.html);
         $('.logged-in').show();
         $('.logged-out').hide();
@@ -59,8 +60,10 @@ $(function(){
         teacher: $('#signup-teacher').prop('checked')
       },
       success: function(data) {
+console.log(data);
         $('#signup-dialog').modal('hide');
-        $('#signed-in-message').html(data.html);
+        $('#signup-message').html('');
+        $('#session-message').html(data.html);
         $('.logged-in').show();
         $('.logged-out').hide();
         $(document).trigger("logged-in", [data.user_id, data.token]);

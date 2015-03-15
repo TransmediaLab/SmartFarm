@@ -29,7 +29,7 @@ jQuery(function(){
       location, locationMapMarker, locationMap,
       field, fieldCount, fieldMapMarker, fieldMap,
       id = window.location.pathname.split('/')[2],
-      ws = new WebSocket("ws://gameken.com/farms/" + id + "/ws");
+      ws = new WebSocket("ws://" + window.location.host + "/farms/" + id + "/ws");
 
   ws.onmessage = function(msg) {
     msg = JSON.parse(msg.data),

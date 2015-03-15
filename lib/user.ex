@@ -20,7 +20,11 @@ defmodule User do
       else
         role = 0
       end
+IO.puts "User.create(#{username}, #{password}, #{teacher}) salt: #{salt}, crypted_password #{crypted_password}"
+map = %{username: username, salt: salt, crypted_password: crypted_password, role: role}
+IO.puts inspect map
       Database.user(nil, %{username: username, salt: salt, crypted_password: crypted_password, role: role})
+
       {:ok, <<"Logged in as ">> <> username}
     else
       {:fail, <<"Username ">> <> username <> <<" is already taken">>}

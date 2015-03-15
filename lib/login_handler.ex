@@ -25,7 +25,7 @@ defmodule LoginHandler do
     {status, user_id, message} = User.authenticate(username, password)
     if status == :ok do
       req = :cowboy_req.set_resp_cookie(<<"userid">>, to_string(user_id), [], req)
-      response = %{user_id: user_id, username: username, html: session(user_id, username)}
+      response = %{user_id: user_id, token: "FOOBAR", username: username, html: session(user_id, username)}
         |> Poison.encode!
         |> to_string
       {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/json"}], response, req

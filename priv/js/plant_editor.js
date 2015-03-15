@@ -27,7 +27,7 @@ jQuery(function() {
 
   /* Set up the websocket communication layer */
   var id = window.location.pathname.split('/')[2],
-      ws = new WebSocket("ws://gameken.com/plants/" + id + "/ws"),
+      ws = new WebSocket("ws://" + window.location.host + "/plants/" + id + "/ws"),
       months = [],
       tempMeasure = 'C';
 
@@ -51,7 +51,7 @@ jQuery(function() {
   };
 
   ws.onclose = function() {
-    ws = new WebSocket("ws://gameken.com/plants/" + id + "/ws"),
+    alert("Connection to the server lost, please refresh the page.");
   }
 
   /* Server response handling */

@@ -27,14 +27,20 @@ defmodule SignupHandler do
     if password != password_confirmation do
       {:ok, req} = :cowboy_req.reply 403, [{"Content-Type", "text/html"}], Layout.alert(<<"danger">>, <<"Password fields must match">>), req
     else
+IO.puts "Creating user with #{username}, #{password}, #{teacher}"
       {status, message} = User.create(username, password, teacher)
+IO.puts "Tried to create user, with result: #{status}, #{message}"
       if status == :ok do
+IO.puts "Looking up user by username #{username}"
         user = Database.user_with_username(username)
-        response = %{user_id: user.id, username: username, html: session(user.id, username)}
+IO.puts inspect user
+        response = %{user_id: user.id, token: "FOOBAR", username: username, html: session(user.id, username)}
           |> Poison.encode!
           |> to_string
+IO.puts "Responding with: #{response}"
         {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/json"}], response, req
       else
+IO.puts "Problem"
         {:ok, req} = :cowboy_req.reply 403, [{"Content-Type", "text/html"}], Layout.alert(<<"danger">>, message), req
       end
     end

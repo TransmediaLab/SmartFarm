@@ -27,7 +27,7 @@ jQuery(function() {
 
   /* Set up the websocket communication layer */
   var id = window.location.pathname.split('/')[2],
-      ws = new WebSocket("ws://gameken.com/weather/" + id + "/ws"),
+      ws = new WebSocket("ws://" + window.location.host + "/weather/" + id + "/ws"),
       months = [],
       tempMeasure = 'C',
       priorState;
