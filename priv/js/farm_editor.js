@@ -70,9 +70,17 @@ jQuery(function(){
   }
 
   ws.onclose = function() {
-    // attempt to re-estblish connection if it goes down
-    ws = new WebSocket("ws://gameken.com/farms/" + id + "/ws");
+    alert('Connection with the server was lost.  Please refresh the page to re-establish it');
   }
+
+  $(document).on('logged-in', function(event, user_id, token){
+    ws.send(JSON.stringify({type: 'logged-in', data: {user_id: user_id, token: token}}));
+  });
+
+  $(document).on('logged-out', function(event){
+    ws.send(JSON.stringify({type: 'logged-out'}));
+  });
+
 
   function panMap() {
     $('#farm-latitude').val(location.lat());

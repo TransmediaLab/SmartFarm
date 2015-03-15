@@ -78,7 +78,7 @@ defmodule FarmWebSocketHandler do
          if user_id == :undefined do
            format_reply(req, "{\"type\":\"not-logged-in\"}", state)
          else
-           if to_string(Farm.user_id(farm)) == user_id do
+           if to_string(Farm.user_id(farm)) == to_string(user_id) do
              id = Farm.save(farm)
            else
              id = Farm.clone(farm, user_id)

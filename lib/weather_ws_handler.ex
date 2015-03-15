@@ -100,7 +100,7 @@ defmodule WeatherWebSocketHandler do
          if user_id == :undefined do
            format_reply(req, "{\"type\":\"not-logged-in\"}", state)
          else
-           if to_string(Weather.user_id(weather)) == user_id do
+           if to_string(Weather.user_id(weather)) == to_string(user_id) do
              id = Weather.save(weather)
            else
              id = Weather.clone(weather, user_id)

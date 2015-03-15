@@ -51,8 +51,17 @@ jQuery(function() {
   };
 
   ws.onclose = function() {
-    alert("Connection to the server lost, please refresh the page.");
+    alert("Connection to the server lost. Please refresh the page to re-establish it.");
   }
+
+  $(document).on('logged-in', function(event, user_id, token){
+    ws.send(JSON.stringify({type: 'logged-in', data: {user_id: user_id, token: token}}));
+  });
+
+  $(document).on('logged-out', function(event){
+    ws.send(JSON.stringify({type: 'logged-out'}));
+  });
+
 
   /* Server response handling */
   ws.onmessage = function(event) {

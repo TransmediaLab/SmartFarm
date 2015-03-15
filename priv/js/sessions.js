@@ -42,7 +42,7 @@ $(function(){
         $('#session-message').html(data.html);
         $('.logged-in').show();
         $('.logged-out').hide();
-        $(document).trigger("logged-in", [data.user_id, data.token]);
+        $(document).trigger('logged-in', [data.user_id, data.token]);
       },
       error: function(xhr) {
         $('#login-message').html(xhr.responseText);
@@ -60,7 +60,6 @@ $(function(){
         teacher: $('#signup-teacher').prop('checked')
       },
       success: function(data) {
-console.log(data);
         $('#signup-dialog').modal('hide');
         $('#signup-message').html('');
         $('#session-message').html(data.html);

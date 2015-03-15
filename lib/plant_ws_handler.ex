@@ -103,7 +103,7 @@ defmodule PlantWebSocketHandler do
          if user_id == :undefined do
            format_reply(req, "{\"type\":\"not-logged-in\"}", state)
          else
-           if to_string(Plant.user_id(plant)) == user_id do
+           if to_string(Plant.user_id(plant)) == to_string(user_id) do
              id = Plant.save(plant)
            else
              id = Plant.clone(plant, user_id)
