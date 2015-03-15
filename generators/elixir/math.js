@@ -23,7 +23,7 @@
 
 /**
  * @fileoverview Generating Elixir for math blocks.
- * @author q.neutron@gmail.com (Quynh Neutron)
+ * @author nhbean@ksu.edu (Nathan Bean)
  */
 'use strict';
 

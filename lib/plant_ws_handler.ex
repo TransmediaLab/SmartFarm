@@ -37,6 +37,10 @@ defmodule PlantWebSocketHandler do
       _ ->
          plant = Plant.load(plant_id)
     end
+
+    # Plant a single seed at the origin
+    Plant.sow(plant, {:point, 0, 0})
+
     # Send the client the plant
     :erlang.send self(), :plant
 
@@ -59,8 +63,10 @@ defmodule PlantWebSocketHandler do
     pause		| none
     reset		| none
     step 		| none
+    name		| text
+    description		| text
     change-code		| text/json {workspace : <Blockly workspace as xml string>, code: <JavaScript code equivalent>}
-
+    save		| none
   """  
   def websocket_handle({:text, msg}, req, state(user_id: user_id, plant: plant)=state) do
     json = Poison.decode! msg
@@ -80,8 +86,15 @@ defmodule PlantWebSocketHandler do
           format_reply(req, reply, state(state, paused: true, time: start))
 
       "step" ->
-IO.puts "STEP"
           :erlang.send self(), :step
+          format_ok(req, state)
+
+      "name" ->
+          Plant.name(plant, json["data"])
+          format_ok(req, state)
+
+      "description" ->
+          Plant.description(plant, json["data"])
           format_ok(req, state)
 
       "save" ->
@@ -118,7 +131,7 @@ IO.puts "STEP"
     the simulation is currently paused, and sends the client an updated time.
   """
   def websocket_info(:step, req, state(time: time, paused: paused, weather: weather, plant: plant)=state) do
-IO.puts "time"
+
     # advance simulation by one day
     time = time + 86400000 
     simState = [simulation_time: time]
@@ -135,7 +148,7 @@ IO.puts "time"
     # schedule next update
     if !paused do :erlang.send_after @step_delay, self(), :step end
 
-    reply = %{type: "state", data: %{simulation_time: time, plants: [Plant.state(plant)]}}
+    reply = %{type: "state", data: %{simulation_time: time, plants: Plant.state(plant)}}
       |> Poison.encode!
       |> to_string
 

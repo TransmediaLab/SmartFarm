@@ -72,6 +72,30 @@ Blockly.Elixir.math_random_int=function(a){var b=Blockly.Elixir.valueToCode(a,"F
 
  SmartFarm hackable glass simulation, built on Google's Blockly
 
+ Copyright 2015 Computing and Information Sciences, Kansas State University.
+ http://smartfarm.cis.k-state.edu
+
+ Copyright 2012 Google Inc.
+ https://developers.google.com/blockly/
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+Blockly.Elixir.lsystems={};Blockly.Elixir.lsystems_draw=function(a){var b=Blockly.Elixir.valueToCode(a,"LSYSTEM",Blockly.Elixir.ORDER_ATOMIC)||"",c=Blockly.Elixir.valueToCode(a,"TIMES",Blockly.Elixir.ORDER_ATOMIC)||"0",d=Blockly.Elixir.valueToCode(a,"ANGLE",Blockly.Elixir.ORDER_ATOMIC)||"0";a=Blockly.Elixir.valueToCode(a,"DISTANCE",Blockly.Elixir.ORDER_ATOMIC)||"0";return["svg_path = LSystem.render("+b+", "+c+", "+d+", "+a+")",Blockly.Elixir.ORDER_ATOMIC]};
+Blockly.Elixir.lsystems_create=function(a){for(var b=a.getFieldValue("AXIOM")||'<<"">>',c=Array(a.itemCount_+1),d=0;d<a.itemCount_;d++)c[d]=Blockly.Elixir.valueToCode(a,"ADD"+d,Blockly.Elixir.ORDER_ATOMIC)||"";c[a.itemCount_]="<<symbol,tail::binary>> -> {<<symbol>>,tail}";c='{:lsystem, <<"'+b+'">>, fn '+c.join("; ")+" end}";return[c,Blockly.Elixir.ORDER_ATOMIC]};
+Blockly.Elixir.lsystems_rule=function(a){var b=a.getFieldValue("MATCH")||"<<0>>";a=a.getFieldValue("YIELD")||match;return['<<"'+b+'",tail::binary>> -> {<<"'+a+'">>,tail}',Blockly.Elixir.ORDER_COMMA]};/*
+
+ SmartFarm hackable glass simulation, built on Google's Blockly
+
  Copyright 2014 Computing and Information Sciences, Kansas State University.
  http://smartfarm.cis.k-state.edu
 

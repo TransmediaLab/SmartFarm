@@ -66,10 +66,13 @@ jQuery(function() {
       case "plant":
         var xml = Blockly.Xml.textToDom(msg.data.workspace);
         Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+        $('#plant-name').val(msg.data.name);
+        $('#plant-description').val(msg.data.description);
         break;
       case "state":
         updateTime(msg.data.simulation_time);
         updateWeather(msg.data);
+        updatePlants(msg.data.plants);
         break;
     }
   }
@@ -111,8 +114,22 @@ jQuery(function() {
   });
 
   $('#save').on('click', function(){
-    var msg = {}
-    msg.type = "save"
+    var msg = {};
+    msg.type = "save";
+    ws.send(JSON.stringify(msg));
+  });
+
+  $('#plant-name').on('change', function(){
+    var msg = {};
+    msg.type = "name";
+    msg.data = $('#plant-name').val();
+    ws.send(JSON.stringify(msg));
+  });
+
+  $('#plant-description').on('change', function(){
+    var msg = {};
+    msg.type = "description";
+    msg.data = $('#plant-description').val();
     ws.send(JSON.stringify(msg));
   });
 
@@ -122,6 +139,20 @@ jQuery(function() {
     $('#calendar-day').html(simTime.getDate());
     $('#calendar-month').html(months[simTime.getMonth()][1]);
   }
+
+  months[0] = ["Januaray", "Jan"];
+  months[1] = ["February", "Feb"];
+  months[2] = ["March", "March"];
+  months[3] = ["April", "April"];
+  months[4] = ["May", "May"];
+  months[5] = ["June", "June"];
+  months[6] = ["July", "July"];
+  months[7] = ["August", "Aug"];
+  months[8] = ["September", "Sept"];
+  months[9] = ["October", "Oct"];
+  months[10] = ["November", "Nov"];
+  months[11] = ["December", "Dec"];
+
 
   /* Set weather values */
   function updateWeather(state) {
@@ -154,7 +185,6 @@ jQuery(function() {
       return ' <i class="wi wi-day-sunny"></i>';
   }
 
-
   function formatValue(value) {
     if(value) return value;
     else return "?";
@@ -167,17 +197,17 @@ jQuery(function() {
     } else return "?";
   }
 
-  months[0] = ["Januaray", "Jan"];
-  months[1] = ["February", "Feb"];
-  months[2] = ["March", "March"];
-  months[3] = ["April", "April"];
-  months[4] = ["May", "May"];
-  months[5] = ["June", "June"];
-  months[6] = ["July", "July"];
-  months[7] = ["August", "Aug"];
-  months[8] = ["September", "Sept"];
-  months[9] = ["October", "Oct"];
-  months[10] = ["November", "Nov"];
-  months[11] = ["December", "Dec"];
+  /* Set Plant values */
+  var svgNS = "http://www.w3.org/2000/svg";
+  var svgDoc = document.getElementById('plant-rendering');
+  var plants = document.createElementNS(svgNS, 'g');
+  svgDoc.appendChild(plants);
+
+  function updatePlants(populationState) {
+    populationState.forEach( function(state) {
+      if(state.svg_path) plants.innerHTML = state.svg_path;
+      else plants.inner_html = "";
+    });
+  }
 
 });

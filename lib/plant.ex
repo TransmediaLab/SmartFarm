@@ -72,8 +72,6 @@ defmodule Plant do
       |> Enum.map fn p -> Enum.into p, %{} end
   end
 
-
-
   @doc """
     Changes the code for the specified plant model.
   """
@@ -88,12 +86,41 @@ defmodule Plant do
     Agent.get(plant, fn model(workspace: workspace) -> workspace end) |> String.replace("\"", "\\\"")
   end
 
+  @doc """
+    Returns the plant model's name
+  """
+  def name(plant) do
+    Agent.get(plant, fn model(name: name) -> name end)
+  end
+
+  @doc """
+    Sets the plant model's name to *name*
+  """
+  def name(plant, name) do
+    Agent.update(plant, fn m -> model(m, name: name) end)
+  end
+
+  @doc """
+    Gets the plant model's description
+  """
+  def description(plant) do
+    Agent.get(plant, fn model(description: description) -> description end)
+  end
+
+  @doc """
+    Sets the plant model's description to *description*
+  """
+  def description(plant, description) do
+    Agent.update(plant, fn m -> model(m, description: description) end)
+  end
+
+
 
 
   @doc """
-    Establishes a new plant in the population at location {x, y}
+    Establishes a new plant in the population at location {:point, x, y}
   """
-  def sow(plant, {x,y}) do
+  def sow(plant, {:point, x, y}) do
     seed = [x: x, y: y, biomass: 1] 
     Agent.update(plant, fn model(code: code, population: population)=m -> model(m, population: [seed|population]) end)
   end

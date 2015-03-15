@@ -365,5 +365,22 @@
 	"PROCEDURES_HIGHLIGHT_DEF": "Highlight function definition",
 	"PROCEDURES_CREATE_DO": "Create '%1'",
 	"PROCEDURES_IFRETURN_TOOLTIP": "If a value is true, then return a second value.",
-	"PROCEDURES_IFRETURN_WARNING": "Warning: This block may be used only within a function definition."
+	"PROCEDURES_IFRETURN_WARNING": "Warning: This block may be used only within a function definition.",
+	"LSYSTEMS_GET_HELPURL": "http://en.wikipedia.org/wiki/L-system",
+	"LSYSTEMS_DRAW_TITLE": "Draw L-System",
+	"LSYSTEMS_DRAW_RECURSIONS": "recursions",
+        "LSYSTEMS_DRAW_WITH": "with",
+	"LSYSTEMS_DRAW_ANGLE": "angle",
+	"LSYSTEMS_DRAW_DISTANCE": "distance",
+        "LSYSTEMS_DRAW_TOOLTIP": "Draws an L-System using the provide angle, distance, and recursions",
+        "LSYSTEMS_CREATE_TITLE": "Create L-System",
+        "LSYSTEMS_CREATE_AXIOM": "with axiom",
+	"LSYSTEMS_CREATE_TOOLTIP": "Creates an L-System with provided axioms and rules",
+	"LSYSTEMS_CREATE_EMPTY_TITLE": "and no rules",
+	"LSYSTEMS_CREATE_INPUT_WITH": "and with rules",
+	"LSYSTEMS_CREATE_CONTAINER_TITLE_ADD": "L-System",
+        "LSYSTEMS_CREATE_CONTAINER_TOOLTIP": "Add or remove rule blocks to this L-System",
+        "LSYSTEMS_CREATE_ITEM_TITLE": "rule",
+	"LSYSTEMS_CREATE_ITEM_TOOLTIP": "Add a rule to the L-System",
+        "LSYSTEMS_RULE_TITLE": "Rule"
 }

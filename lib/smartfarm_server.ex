@@ -8,6 +8,7 @@ defmodule SmartfarmServer do
         {'/font/[...]', :cowboy_static, {:priv_dir, :smartfarm, <<"font">>}},
         {'/css/[...]', :cowboy_static, {:priv_dir, :smartfarm, <<"css">>}},
         {'/js/[...]', :cowboy_static, {:priv_dir, :smartfarm, <<"js">>}},
+        {'/media/[...]', :cowboy_static, {:priv_dir, :smartfarm, <<"media">>}},
         {'/ws',  FileHandler, []},
         {'/login', LoginHandler, []},
         {'/logout', LogoutHandler, []},
