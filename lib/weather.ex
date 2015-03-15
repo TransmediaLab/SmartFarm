@@ -6,7 +6,6 @@ defmodule Weather do
 
   require EEx
   require Record
-  require Execjs
 
   # A record for the weather agent model
   Record.defrecordp :model, id: nil, user_id: nil, name: <<"Unnamed Weather">>, description: <<"">>, workspace: <<"">>, code: <<"">>, state: []

@@ -22,7 +22,7 @@ defmodule SmartFarm.Mixfile do
     [
       {:cowboy, github: "extend/cowboy"},
       {:gproc, github: "esl/gproc"},
-      {:execjs, path: "../execjs"},
+      {:poison, github: "devinus/poison"},
       {:postgrex, "~> 0.6"}
     ]
   end

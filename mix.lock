@@ -4,6 +4,6 @@
   "emysql": {:git, "git://github.com/eonblast/emysql.git", "c7e2103f8b737667f0128802e8de2f0d5ed2fa5c", []},
   "execjs": {:git, "git://github.com/devinus/execjs.git", "97440001d9d45dd43fb491b81a544c3389f0c325", []},
   "gproc": {:git, "git://github.com/esl/gproc.git", "1f12fbf6fd75cb4fa6e7b38f331fe3e1fdd2adf0", []},
-  "poison": {:hex, :poison, "1.1.1"},
+  "poison": {:git, "git://github.com/devinus/poison.git", "6fbfc6b1afc76d36884a6d7223d227f3940913b7", []},
   "postgrex": {:hex, :postgrex, "0.7.0"},
   "ranch": {:git, "git://github.com/extend/ranch.git", "3189ef2d47843945efc96c224963380462c33d40", [ref: "0.10.0"]}}
