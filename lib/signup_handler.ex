@@ -3,6 +3,11 @@ defmodule SignupHandler do
     Handles AJAX-based account creation
   """
 
+  require EEx
+
+  # helper function to render logged in session status
+  EEx.function_from_file :defp, :session, "priv/templates/sessions/logged_in.html.eex", [:id, :username]
+
   @doc """
     Initializes the handler
   """
@@ -22,11 +27,13 @@ defmodule SignupHandler do
     if password != password_confirmation do
       {:ok, req} = :cowboy_req.reply 403, [{"Content-Type", "text/html"}], Layout.alert(<<"danger">>, <<"Password fields must match">>), req
     else
-IO.puts "User.create being called"
       {status, message} = User.create(username, password, teacher)
-IO.puts message
       if status == :ok do
-        {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.alert(<<"info">>, message), req
+        user = Database.user_with_username(username)
+        response = %{user_id: user.id, username: username, html: session(user.id, username)}
+          |> Poison.encode!
+          |> to_string
+        {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/json"}], response, req
       else
         {:ok, req} = :cowboy_req.reply 403, [{"Content-Type", "text/html"}], Layout.alert(<<"danger">>, message), req
       end

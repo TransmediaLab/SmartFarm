@@ -27,7 +27,10 @@
       <p>
         <span class="glyphicon glyphicon-exclamation-sign"></span>
         Plant Models control how specific kinds of plants in your 
-        simulation will grow.
+        simulation will grow. They can be based on statistics 
+        derived from observation, implemented by following botany 
+        science theory, or allow you to explore how theoretical new
+        varieties - like drought-resistant strains - might fare.
       </p>
       <p>
         You can use one or more of the Plant Models below in your simulation, or
@@ -35,7 +38,7 @@
       </p>
       <div id="search-results">
         <%= models %>
-        <a href="#" id="load-more-weather">Load more plant models</a>
+        <!--a href="#" id="load-more-weather">Load more plant models</a-->
       </div>
     </div>
   </div>

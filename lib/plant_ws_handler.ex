@@ -65,8 +65,10 @@ defmodule PlantWebSocketHandler do
     step 		| none
     name		| text
     description		| text
-    change-code		| text/json {workspace : <Blockly workspace as xml string>, code: <JavaScript code equivalent>}
+    change-code		| text/json {workspace: <Blockly workspace as xml string>, code: <JavaScript code equivalent>}
     save		| none
+    logged-in		| text/json {user_id: <signed in user's id>, token: <time-sensitive authentication token>}
+    logged-out		| none
   """  
   def websocket_handle({:text, msg}, req, state(user_id: user_id, plant: plant)=state) do
     json = Poison.decode! msg
@@ -112,6 +114,12 @@ defmodule PlantWebSocketHandler do
       "change-code" ->
           Plant.change_code(plant, json["data"]["code"], json["data"]["workspace"])
           format_ok(req, state)
+
+      "logged-in" ->
+          format_ok(req, state(state, user_id: json["data"]["user_id"]))
+
+      "logged-out" ->
+          format_ok(req, state(state, user_id: :undefined))
 
       msg ->
           format_ok(req, state)

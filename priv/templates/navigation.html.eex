@@ -15,13 +15,13 @@
     <!-- Navigation links -->
     <div class="collapase navbar-collapse" id="nav">
       <ul class="nav navbar-nav">
-        
+        <!--
         <%= if controller == :simulations do %>
           <li class="active"><a href="/simulations">Simulations</a></li>
         <% else %>
           <li><a href="/simulations">Simulations</a></li>
         <% end %>
-
+        -->
         <%= if controller == :farms do %>
           <li class="active"><a href="/farms">Farms</a></li>
         <% else %>

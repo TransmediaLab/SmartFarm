@@ -69,6 +69,11 @@ jQuery(function(){
     }
   }
 
+  ws.onclose = function() {
+    // attempt to re-estblish connection if it goes down
+    ws = new WebSocket("ws://gameken.com/farms/" + id + "/ws");
+  }
+
   function panMap() {
     $('#farm-latitude').val(location.lat());
     $('#farm-longitude').val(location.lng());

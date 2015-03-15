@@ -2,7 +2,7 @@ defmodule Database do
 
   require Record
   
-  @rows_to_list 2
+  @rows_to_list 200
 
   def init do
     {:ok, pid} = Postgrex.Connection.start_link(hostname: "localhost", username: "smartfarm", password: "smartFARMING", database: "smartfarm_#{Mix.env}")

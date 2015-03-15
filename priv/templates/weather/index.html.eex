@@ -38,7 +38,7 @@
       </p>
       <div id="search-results">
         <%= models %>
-        <a href="#" id="load-more-weather">Load more weather models</a>
+        <!--a href="#" id="load-more-weather">Load more weather models</a-->
       </div>
     </div>
   </div>

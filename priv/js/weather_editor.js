@@ -51,6 +51,19 @@ jQuery(function() {
     });
   };
 
+  ws.onclose = function() {
+    // attempt to re-estblish connection if it goes down
+    ws = new WebSocket("ws://gameken.com/weather/" + id + "/ws");
+  }
+
+  $(document).on('logged-in', function(event, user_id, token){
+    ws.send(JSON.stringify({type: 'logged-in', data: {user_id: user_id, token: token}}));
+  });
+
+  $(document).on('logged-out', function(event){
+    ws.send(JSON.stringify({type: 'logged-out'}));
+  });
+
   /* Server response handling */
   ws.onmessage = function(event) {
     var msg = JSON.parse(event.data);

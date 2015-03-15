@@ -24,10 +24,17 @@
       </div>
     </div>
     <div class="col-sm-9">
+      <p>
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        Farms are the locations where your simluated crops will grow.  
+        They can be based on real-world data gathered in the field, 
+        from maps and reference documents like soil surveys, or drawn
+        from the imagination.
+      </p>
       <p>You can select one of the farms below, or <a href="/farms/new">create your own</a></p>
       <div id="search-results">
         <%= farms %>
-        <a href="#" id="load-more-farms">Load more farms</a>
+        <!--a href="#" id="load-more-farms">Load more farms</a-->
       </div>
     </div>
   </div>

@@ -6,7 +6,7 @@ defmodule LogoutHandler do
   require EEx
 
   # helper function to render logged out session status  
-  EEx.function_from_file :defp, :session, "priv/templates/session_logged_out.html.eex", []
+  EEx.function_from_file :defp, :session, "priv/templates/sessions/logged_out.html.eex", []
 
   @doc """
     Initializes the logout handler

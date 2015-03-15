@@ -24,6 +24,7 @@ $(function(){
         $('#session-message').html(data);
         $('.logged-in').hide();
         $('.logged-out').show();
+        $(document).trigger("logged-out");
       }
     });
     return false;
@@ -36,11 +37,11 @@ $(function(){
       method: "POST",
       data: {username: username, password: password},
       success: function(data) {
-console.log(data);
         $('#login-dialog').modal('hide');
-        $('#session-message').html(data);
+        $('#session-message').html(data.html);
         $('.logged-in').show();
         $('.logged-out').hide();
+        $(document).trigger("logged-in", [data.user_id, data.token]);
       },
       error: function(xhr) {
         $('#login-message').html(xhr.responseText);
@@ -59,9 +60,10 @@ console.log(data);
       },
       success: function(data) {
         $('#signup-dialog').modal('hide');
-        $('#signed-in-message').html(data);
+        $('#signed-in-message').html(data.html);
         $('.logged-in').show();
         $('.logged-out').hide();
+        $(document).trigger("logged-in", [data.user_id, data.token]);
       },
       error: function(xhr) {
         $('#signup-message').html(xhr.responseText);

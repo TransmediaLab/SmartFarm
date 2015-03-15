@@ -63,6 +63,8 @@ defmodule WeatherWebSocketHandler do
     description		| text
     save		| none
     change-code		| text/json {workspace : <Blockly workspace as xml string>, code: <JavaScript code equivalent>}
+    logged-in		| integer <user_id>
+    logged-out		| none
 
   """  
   def websocket_handle({:text, msg}, req, state(user_id: user_id, weather: weather)=state) do
@@ -109,6 +111,12 @@ defmodule WeatherWebSocketHandler do
       "change-code" ->
           Weather.change_code(weather, json["data"]["workspace"], json["data"]["code"])
           format_ok(req, state)
+
+      "logged-in" ->
+          format_ok(req, state(state, user_id: json["data"]["user_id"]))
+
+      "logged-out" ->
+          format_ok(req, state(state, user_id: :undefined))
 
       msg ->
           format_ok(req, state)

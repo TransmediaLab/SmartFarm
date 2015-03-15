@@ -50,6 +50,8 @@ defmodule FarmWebSocketHandler do
     description		| text
     fields		| text/JSON
     save		| none
+    logged-in		| text/JSON
+    logged-out		| none
 
   """  
   def websocket_handle({:text, msg}, req, state(user_id: user_id, farm: farm)=state) do
@@ -83,6 +85,12 @@ defmodule FarmWebSocketHandler do
            end
            format_reply(req, "{\"type\":\"new-id\",\"data\":#{id}}", state)
          end
+
+      "logged-in" ->
+          format_ok(req, state(state, user_id: json["data"]["user_id"]))
+
+      "logged-out" ->
+          format_ok(req, state(state, user_id: :undefined))
 
       msg ->
           format_ok(req, state)

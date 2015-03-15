@@ -11,8 +11,8 @@ defmodule Layout do
   EEx.function_from_file :defp, :navigation, 	"priv/templates/navigation.html.eex", [:controller, :session_message]
   EEx.function_from_file :defp, :login, 	"priv/templates/login.html.eex", []
   EEx.function_from_file :defp, :signup,	"priv/templates/signup.html.eex", []
-  EEx.function_from_file :defp, :session_live,	"priv/templates/session_logged_in.html.eex", [:id, :username]
-  EEx.function_from_file :defp, :session_dead,	"priv/templates/session_logged_out.html.eex", []
+  EEx.function_from_file :defp, :session_live,	"priv/templates/sessions/logged_in.html.eex", [:id, :username]
+  EEx.function_from_file :defp, :session_dead,	"priv/templates/sessions/logged_out.html.eex", []
 
   @doc """
     Renders the provided message as a Bootstrap (http://getbootstrap.com) alert at

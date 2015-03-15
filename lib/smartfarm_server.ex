@@ -21,7 +21,7 @@ defmodule SmartfarmServer do
         {'/farms/:id/ws', FarmWebSocketHandler, []},
         {'/simulations[/:id]', SimulationHandler, []},
         {'/simulation_ws', SimulationWebSocketHandler, []},
-        {'/',    HelloHandler, []}
+        {'/', FarmHandler, []}
       ]}
     ])
     :cowboy.start_http :my_http_listener, 100, [{:port, 80}], [{:env, [{:dispatch, dispatch}]}]

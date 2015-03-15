@@ -34,9 +34,13 @@ defmodule WeatherHandler do
              |> Enum.map(fn {id, user_id, username, name, desc} -> weather_model(id, user_id, username, name, desc) end)
            {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], reply, req
          else
-           user_filters = [{user_id, Database.user(user_id).username}]
-             |> Enum.map(fn {uid, uname} -> filter(uid, uname) end)
-             |> Enum.join
+           if user_id do
+             user_filters = [{user_id, Database.user(user_id).username}]
+               |> Enum.map(fn {uid, uname} -> filter(uid, uname) end)
+               |> Enum.join
+           else
+             user_filters = nil
+           end
            content = Database.list_weather
              |> Enum.map(fn {id, user_id, username, name, desc} -> weather_model(id, user_id, username, name, desc) end)
              |> weather_index(user_filters)

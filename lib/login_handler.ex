@@ -6,7 +6,7 @@ defmodule LoginHandler do
   require EEx
 
   # helper function to render logged in session status
-  EEx.function_from_file :defp, :session, "priv/templates/session_logged_in.html.eex", [:id, :username]
+  EEx.function_from_file :defp, :session, "priv/templates/sessions/logged_in.html.eex", [:id, :username]
 
   @doc """ 
     Initializes the LoginHandler
@@ -25,7 +25,10 @@ defmodule LoginHandler do
     {status, user_id, message} = User.authenticate(username, password)
     if status == :ok do
       req = :cowboy_req.set_resp_cookie(<<"userid">>, to_string(user_id), [], req)
-      {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], session(user_id, username), req
+      response = %{user_id: user_id, username: username, html: session(user_id, username)}
+        |> Poison.encode!
+        |> to_string
+      {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/json"}], response, req
     else
       {:ok, req} = :cowboy_req.reply 403, [{"Content-Type", "text/html"}], Layout.alert(<<"danger">>, message), req
     end

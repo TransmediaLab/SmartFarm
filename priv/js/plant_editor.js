@@ -50,6 +50,10 @@ jQuery(function() {
     });
   };
 
+  ws.onclose = function() {
+    ws = new WebSocket("ws://gameken.com/plants/" + id + "/ws"),
+  }
+
   /* Server response handling */
   ws.onmessage = function(event) {
     var msg = JSON.parse(event.data);
