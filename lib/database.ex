@@ -27,7 +27,6 @@ defmodule Database do
   """
   def user_with_username(username) do
     %Postgrex.Result{num_rows: 1, rows: [{id, username, crypted_password, salt, role}]} = Postgrex.Connection.query!(:conn, "SELECT id, username, crypted_password, salt, role FROM users WHERE username = '#{esc(username)}';", [])
-IO.puts "Mapping id: #{id}, username: #{username}, crypted_password: #{crypted_password}, salt: #{salt}, role: #{role}"
     %{id: id, username: username, crypted_password: crypted_password, salt: salt, role: role}
   end
 
