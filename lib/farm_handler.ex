@@ -66,7 +66,7 @@ defmodule FarmHandler do
       _ ->
          options = [
            title: <<"Farm Model Editor">>, 
-           controller: :plants, 
+           controller: :farms, 
            user_id: user_id,
            maps: true,
            scripts: ["/js/farm_editor.js"]
