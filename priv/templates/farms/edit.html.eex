@@ -1,80 +1,83 @@
-<div class="fluid-container">
-  <h1>Edit Farm</h1>
-  </div>
-    <label for="farm-name">Name</label>
-    <input type="text" class="form-control" id="farm-name" />
-  </div>
-
-  <h2>Location</h2>
-  <p> 
-    Where will you locate your farm?  You can search for a location, 
-    enter the latitude & longitude manully, or drag the map marker to
-    the location you want.  This is where your farm's virtual farmhouse
-    and equipment shed will be located.
-  </p>
+<div class="container">
   <div class="row">
-    <div class="col-md-3">
-      <div class="form-group">
-        <label for="farm-latitude">Latitude</label>
-        <input type="text" class="form-control" id="farm-latitude" />
+    <h1>Edit Farm</h1>
+    <div class="field">
+      <label for="farm-name">Name</label>
+      <input type="text" class="form-control" id="farm-name" />
+    </div>
+
+    <h2>Location</h2>
+    <p> 
+      Where will you locate your farm?  You can search for a location, 
+      enter the latitude & longitude manully, or drag the map marker to
+      the location you want.  This is where your farm's virtual farmhouse
+      and equipment shed will be located.
+    </p>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label for="farm-latitude">Latitude</label>
+          <input type="text" class="form-control" id="farm-latitude" />
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <label for="farm-longitude">Longitude</label>
+          <input type="text" class="form-control" id="farm-longitude" />
+         </div>
+      </div>
+      <div class="col-md-2">
+        <button id="location-capture" role="button" class="btn btn-default">
+          <span class="glyphicon glyphicon-screenshot"></span>
+          Use Device Location
+        </button>
+      </div>
+      <div class="col-md-4">
+        <div class="input-group">
+          <input type="text" class="form-control" id="location-address" placeholder="search by farm address" />
+          <span class="input-group-btn">
+            <button id="location-search" type="button" class="btn btn-default">
+              <span class="glyphicon glyphicon-search"></span>
+            </button>
+          </span>
+        </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="form-group">
-        <label for="farm-longitude">Longitude</label>
-        <input type="text" class="form-control" id="farm-longitude" />
-      </div>
+    <br>
+
+    <div class="well">
+      <div width="640px" height="480px" class="map" id="location-map"></div>
     </div>
-    <div class="col-md-2">
-      <button id="location-capture" role="button" class="btn btn-default">
-        <span class="glyphicon glyphicon-screenshot"></span>
-        Use Device Location
+
+    <h2>Fields</h2>
+    <p>
+      Where are the fields you will use to grow crops?  Mark the 
+      boundaries of your fields below by clicking on the map, or
+      by walking the borders of your field's real-world location
+      with a mobile device, or by manually entering the latitude
+      and longitude of points along the border.
+    </p>
+    <div class="well">
+      <div width="640px" height="480px" class="map" id="field-map"></div>
+    </div>
+    <ul id="farm-fields" class="list-group">
+    </ul>
+
+    <h2>Description</h2>
+    <div class="form">
+      <label for="farm-description">Description</label>
+      <textarea class="form-control" rows="3" id="farm-description" ></textarea>
+    </div>
+
+    <h2>Save</h2>
+    <p>Just click the button below to save your new farm!</p>
+    <p>
+      <button id="farm-save" class="btn btn-lg">
+        <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+        Save
       </button>
-    </div>
-    <div class="col-md-4">
-      <div class="input-group">
-        <input type="text" class="form-control" id="location-address" placeholder="search by farm address" />
-        <span class="input-group-btn">
-          <button id="location-search" type="button" class="btn btn-default">
-            <span class="glyphicon glyphicon-search"></span>
-          </button>
-        </span>
-      </div>
-    </div>
+    </p>
+
   </div>
-
-  <div class="well">
-    <div width="640px" height="480px" class="map" id="location-map"></div>
-  </div>
-
-  <h2>Fields</h2>
-  <p>
-    Where are the fields you will use to grow crops?  Mark the 
-    boundaries of your fields below by clicking on the map, or
-    by walking the borders of your field's real-world location
-    with a mobile device, or by manually entering the latitude
-    and longitude of points along the border.
-  </p>
-  <div class="well">
-    <div width="640px" height="480px" class="map" id="field-map"></div>
-  </div>
-  <ul id="farm-fields" class="list-group">
-  </ul>
-
-  <h2>Description</h2>
-  <div class="form">
-    <label for="farm-description">Description</label>
-    <textarea class="form-control" rows="3" id="farm-description" ></textarea>
-  </div>
-
-  <h2>Save</h2>
-  <p>Just click the button below to save your new farm!</p>
-  <p>
-    <button id="farm-save" class="btn btn-lg">
-      <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
-      Save
-    </button>
-  </p>
-
 </div>
 
