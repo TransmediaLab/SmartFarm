@@ -1,15 +1,11 @@
-<div class="container">
-  <h1>Create a New Farm</h1>
-  <p>
-    Complete the steps below to create your own farm,
-    which you can then use in your own simulations.
-  </p>
-  <div class="input-group">
+<div class="fluid-container">
+  <h1>Edit Farm</h1>
+  </div>
     <label for="farm-name">Name</label>
     <input type="text" class="form-control" id="farm-name" />
   </div>
 
-  <h2>Step 1: Location</h2>
+  <h2>Location</h2>
   <p> 
     Where will you locate your farm?  You can search for a location, 
     enter the latitude & longitude manully, or drag the map marker to
@@ -51,7 +47,7 @@
     <div width="640px" height="480px" class="map" id="location-map"></div>
   </div>
 
-  <h2>Step 2: Fields</h2>
+  <h2>Fields</h2>
   <p>
     Where are the fields you will use to grow crops?  Mark the 
     boundaries of your fields below by clicking on the map, or
@@ -65,13 +61,13 @@
   <ul id="farm-fields" class="list-group">
   </ul>
 
-  <h2>Step 3: Description</h2>
+  <h2>Description</h2>
   <div class="form">
     <label for="farm-description">Description</label>
     <textarea class="form-control" rows="3" id="farm-description" ></textarea>
   </div>
 
-  <h2>Step 4: Save</h2>
+  <h2>Save</h2>
   <p>Just click the button below to save your new farm!</p>
   <p>
     <button id="farm-save" class="btn btn-lg">

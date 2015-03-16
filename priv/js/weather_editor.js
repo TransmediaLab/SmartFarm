@@ -156,7 +156,6 @@ jQuery(function() {
 
   /* Set weather values */
   function updateWeather(state) {
-
     if(priorState){
       var simTime = new Date(priorState.simulation_time),
           html = "";
@@ -207,7 +206,7 @@ jQuery(function() {
     $('#weather-info').html(info);
 
     $('#weather-precipitation').html("Precipitation: " + precipitation + " mm");
-    $('#weather-humidity').html("Humidity: " + formatValue(state.weather_humidity) + "%");
+    $('#weather-humidity').html("Humidity: " + formatValue(state.weather_relative_humidity) + "%");
     $('#weather-wind').html("Wind: " + formatValue(state.weather_wind_speed) + "m/s");
     
   }

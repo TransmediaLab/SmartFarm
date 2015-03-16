@@ -33,7 +33,7 @@
         <button id="save" class="btn btn-default btn-lg">
           <span class="glyphicon glyphicon-floppy-disk">
         </button>
-        <span id="weather-ticker">
+        <!--span id="weather-ticker">
              January 1st 2014
               <i class="wi wi-day-sprinkle"></i>
               <i class="wi wi-thermometer"></i>30
@@ -42,7 +42,7 @@
               <i class="wi wi-fahrenheit"></i>
               <i class="wi wi-sprinkles"></i> 20 inches
 
-        </span>
+        </span-->
       </div>
     </div>
 

@@ -147,12 +147,12 @@
   </category>
 
 
-  <category name="Logic"></category>
+  <!--category name="Logic"></category>
   <category name="Loops"></category>
   <category name="Text"></category>
   <category name="Lists"></category>
   <category name="Colour"></category>
   <category name="Variables" custom="VARIABLE"></category>
-  <category name="Functions" custom="PROCEDURE"></category>
+  <category name="Functions" custom="PROCEDURE"></category-->
 </xml>
 
