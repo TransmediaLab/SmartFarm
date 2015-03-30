@@ -69,7 +69,7 @@ jQuery(function() {
     var msg = JSON.parse(event.data);
     switch(msg.type) {
       case "not-logged-in":
-        alert("You must be logged in to save!");
+        $(document).trigger('log-in-to-save');
         break;
       case "new-id":
         window.history.pushState("", "", "/weather/" + msg["data"]);

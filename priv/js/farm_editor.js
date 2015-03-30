@@ -38,7 +38,7 @@ jQuery(function(){
         fieldCount = 0;
     switch(msg["type"]) {
       case "not-logged-in":
-        alert("You must be logged in?");
+        $(document).trigger('log-in-to-save');
         break;
       case "new-id":
         window.history.pushState("", "", "/farms/" + msg["data"]);

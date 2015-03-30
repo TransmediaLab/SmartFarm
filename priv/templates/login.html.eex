@@ -6,7 +6,7 @@
         <h4 class="modal-title">Sign In</h4>
       </div>
       <div class="modal-body">
-        <div id="login-message">
+        <div id="login-message" class="text-danger bg-danger">
         </div>
         <div class="form-group">
           <label for="login-username">Username</label>

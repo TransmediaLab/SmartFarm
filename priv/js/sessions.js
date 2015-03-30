@@ -1,5 +1,13 @@
 $(function(){
 
+  $(document).on('log-in-to-save', function(event) {
+    event.preventDefault();
+    $('#login-message').html('<span class="glyphicon glyphicon-warning-sign"></span> You must be logged in to save!');
+    $('#login-dialog').modal();
+    $('#login-username').focus();
+    return false;
+  });
+
   $('body').on('click', '.login-link', function(event) {
     event.preventDefault();
     $('#login-dialog').modal();
