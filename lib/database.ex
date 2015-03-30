@@ -221,6 +221,8 @@ defmodule Database do
     values contained in the Map *data*.  Returns the farm's id.
   """
   def farm(id, data) do
+IO.puts "Location: #{data.latitude}, #{data.longitude}"
+IO.puts "UPDATE farms SET name='#{esc(data.name)}', description='#{esc(data.description)}', latitude=#{data.latitude}, longitude=#{data.longitude}, fields='#{esc(data.fields)}' WHERE id = " <> to_string(id)
     Postgrex.Connection.query!(:conn, "UPDATE farms SET name='#{esc(data.name)}', description='#{esc(data.description)}', latitude=#{data.latitude}, longitude=#{data.longitude}, fields='#{esc(data.fields)}' WHERE id = " <> to_string(id), [])
     id
   end

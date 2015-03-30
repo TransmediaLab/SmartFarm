@@ -19,7 +19,7 @@ defmodule Farm do
   """
   def load(id) do
     data = Database.farm(id)
-    {:ok, farm} = Agent.start_link(fn -> model(id: id, user_id: data.user_id, name: data.name, description: data.description, fields: data.fields) end)
+    {:ok, farm} = Agent.start_link(fn -> model(id: id, user_id: data.user_id, name: data.name, description: data.description, latitude: data.latitude, longitude: data.longitude, fields: data.fields) end)
     farm
   end
 
@@ -92,6 +92,20 @@ defmodule Farm do
   """
   def description(farm, description) do
     Agent.update(farm, fn s -> model(s, description: description) end)
+  end
+
+  @doc """
+    Returns a farm's latitude and longitude as a point
+  """
+  def location(farm) do
+    Agent.get(farm, fn model(latitude: latitude, longitude: longitude) -> {:point, latitude, longitude} end)
+  end
+
+  @doc """
+    Updates a farm's location to the provided latitude and longitude
+  """
+  def location(farm, latitude, longitude) do
+    Agent.update(farm, fn s -> model(s, latitude: latitude, longitude: longitude) end)
   end
 
   @doc """

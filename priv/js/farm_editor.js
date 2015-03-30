@@ -89,6 +89,7 @@ jQuery(function(){
     locationMap.panTo(location);
     fieldMapMarker.setPosition(location);
     fieldMap.panTo(location);
+    ws.send(JSON.stringify({type: 'location', data: {latitude: location.lat(), longitude: location.lng()}}));
   }
 
   /* Location map controls & data */

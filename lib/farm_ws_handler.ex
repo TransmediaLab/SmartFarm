@@ -48,6 +48,7 @@ defmodule FarmWebSocketHandler do
     login		| text
     name  		| text
     description		| text
+    location		| text/JSON
     fields		| text/JSON
     save		| none
     logged-in		| text/JSON
@@ -68,6 +69,10 @@ defmodule FarmWebSocketHandler do
 
       "description" ->
          Farm.description(farm, json["data"])
+         format_ok(req, state)
+
+      "location" ->
+         Farm.location(farm, json["data"]["latitude"], json["data"]["longitude"])
          format_ok(req, state)
 
       "fields" ->
