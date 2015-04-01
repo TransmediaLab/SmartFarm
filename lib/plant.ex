@@ -13,14 +13,14 @@ defmodule Plant do
   require Record
 
   # A record for the plant agent model
-  Record.defrecordp :model, :plant, id: nil, user_id: nil, name: "Unnamed Plant", description: "", code: "", workspace: "", population: []
+  Record.defrecordp :model, :plant, id: nil, user_id: nil, name: "Unnamed Plant", description: "", code: "", workspace: "", environment: [], population: []
 
   @doc """
     Loads a plant model from the database and returns a plant agent
   """
   def load(id) do
     data = Database.plant(id)
-    {:ok, agent} = Agent.start_link(fn -> model(id: id, user_id: data.user_id, name: data.name, description: data.description, workspace: data.workspace, code: data.code) end)
+    {:ok, agent} = Agent.start_link(fn -> model(id: id, user_id: data.user_id, name: data.name, description: data.description, workspace: data.workspace, code: data.code, environment: data.environment) end)
     agent
   end
 
@@ -36,8 +36,8 @@ defmodule Plant do
     Saves the current plant model and returns its id.
   """
   def save(plant) do
-    model(id: id, user_id: user_id, name: name, description: description, code: code, workspace: workspace) = Agent.get(plant, fn s -> s end)
-    id = Database.plant(id, %{user_id: user_id, name: name, description: description, code: code, workspace: workspace})
+    model(id: id, user_id: user_id, name: name, description: description, code: code, workspace: workspace, environment: environment) = Agent.get(plant, fn s -> s end)
+    id = Database.plant(id, %{user_id: user_id, name: name, description: description, code: code, workspace: workspace, environment: environment})
   end
 
   @doc """
@@ -75,8 +75,17 @@ defmodule Plant do
   @doc """
     Changes the code for the specified plant model.
   """
-  def change_code(plant, code, workspace) do
-    Agent.update(plant, fn p -> model(p, code: code, workspace: workspace) end)
+  def change_code(plant, code, workspace, variables) do
+    environment = variables |> Enum.into([], fn var -> {String.to_atom(var), 0} end)
+    Agent.update(plant, fn model(population: population) = p -> model(p, code: code, workspace: workspace, environment: environment, population: change_environment(population, [], environment)) end)
+  end
+
+  defp change_environment([], plants, _environment) do
+    plants
+  end
+
+  defp change_environment([head|tail], plants, environment) do
+    change_environment(tail, [Keyword.merge(plants, environment)|plants], environment)
   end
 
   @doc """
@@ -122,7 +131,7 @@ defmodule Plant do
   """
   def sow(plant, {:point, x, y}) do
     seed = [x: x, y: y, biomass: 1] 
-    Agent.update(plant, fn model(code: code, population: population)=m -> model(m, population: [seed|population]) end)
+    Agent.update(plant, fn model(code: code, environment: environment, population: population)=m -> model(m, population: [Keyword.merge(environment,seed)|population]) end)
   end
 
   @doc """

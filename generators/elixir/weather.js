@@ -43,7 +43,7 @@ Blockly.Elixir.addReservedWords(
 
 
 Blockly.Elixir['weather_set_precipitation'] = function(block) {
-  var precipitation = Blockly.Elixir.valueToCode(block, 'PRECIPITATION', Blockly.Elixir.ORDER_ATOMIC);
+  var precipitation = Blockly.Elixir.valueToCode(block, 'PRECIPITATION', Blockly.Elixir.ORDER_ATOMIC) || '0';
   var measure = block.getFieldValue('MEASURE');
   var form = block.getFieldValue('FORM');  
   // Convert to mm, if needed
@@ -81,7 +81,7 @@ Blockly.Elixir['weather_get_precipitation'] = function(block) {
 };
 
 Blockly.Elixir['weather_set_solar_radiation'] = function(block) {
-  var radiation = Blockly.Elixir.valueToCode(block, 'RADIATION', Blockly.Elixir.ORDER_ATOMIC);
+  var radiation = Blockly.Elixir.valueToCode(block, 'RADIATION', Blockly.Elixir.ORDER_ATOMIC) || '0';
   var unit = block.getFieldValue('UNIT');
   // Convert if necessary
   if(unit == 'LANGLEY') {
@@ -101,7 +101,7 @@ Blockly.Elixir['weather_get_solar_radiation'] = function(block) {
 };
 
 Blockly.Elixir['weather_set_temperature'] = function(block) {
-  var temperature = Blockly.Elixir.valueToCode(block, 'TEMP', Blockly.Elixir.ORDER_ATOMIC);
+  var temperature = Blockly.Elixir.valueToCode(block, 'TEMP', Blockly.Elixir.ORDER_ATOMIC) || '0';
   var measure = block.getFieldValue('MEASURE');
   var category = block.getFieldValue('CATEGORY');
   // Convert to Degrees C, if needed
@@ -144,7 +144,7 @@ Blockly.Elixir['weather_get_temperature'] = function(block) {
 };
 
 Blockly.Elixir['weather_set_wind_speed'] = function(block) {
-  var speed = Blockly.Elixir.valueToCode(block, 'SPEED', Blockly.Elixir.ORDER_ATOMIC);
+  var speed = Blockly.Elixir.valueToCode(block, 'SPEED', Blockly.Elixir.ORDER_ATOMIC) || '0';
   var measure = block.getFieldValue('MEASURE');
   // convert to m/s, if neccessary
   if(measure == 'MILES_PER_HOUR') {
@@ -165,7 +165,7 @@ Blockly.Elixir['weather_get_wind_speed'] = function(block) {
 };
 
 Blockly.Elixir['weather_set_wind_direction'] = function(block) {
-  var direction = Blockly.Elixir.valueToCode(block, 'DIRECTION', Blockly.Elixir.ORDER_ATOMIC);
+  var direction = Blockly.Elixir.valueToCode(block, 'DIRECTION', Blockly.Elixir.ORDER_ATOMIC) || '0';
   return 'weather_wind_direction=' + direction + '\n';
 };
 
@@ -185,7 +185,7 @@ Blockly.Elixir['weather_get_dew_point'] = function(block) {
 };
 
 Blockly.Elixir['weather_set_relative_humidity'] = function(block) {
-  var humidity = Blockly.Elixir.valueToCode(block, 'RELATIVE_HUMIDITY', Blockly.Elixir.ORDER_ATOMIC);
+  var humidity = Blockly.Elixir.valueToCode(block, 'RELATIVE_HUMIDITY', Blockly.Elixir.ORDER_ATOMIC) || '0';
   return 'weather_relative_humidity=' + humidity + '\n';
 };
 

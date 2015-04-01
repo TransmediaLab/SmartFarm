@@ -46,6 +46,7 @@ jQuery(function() {
       msg.type = "change-code"
       msg.data.workspace = Blockly.Xml.domToText(xml);
       msg.data.code = Blockly.Elixir.workspaceToCode();
+      msg.data.variables = Blockly.Variables.allVariables(Blockly.mainWorkspace);
       ws.send(JSON.stringify(msg));
     });
   };

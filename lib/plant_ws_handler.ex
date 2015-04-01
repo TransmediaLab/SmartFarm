@@ -65,7 +65,7 @@ defmodule PlantWebSocketHandler do
     step 		| none
     name		| text
     description		| text
-    change-code		| text/json {workspace: <Blockly workspace as xml string>, code: <JavaScript code equivalent>}
+    change-code		| text/json {workspace: <Blockly workspace as xml string>, code: <JavaScript code equivalent>, variables: <array of variable names>}
     save		| none
     logged-in		| text/json {user_id: <signed in user's id>, token: <time-sensitive authentication token>}
     logged-out		| none
@@ -112,7 +112,7 @@ defmodule PlantWebSocketHandler do
          end
 
       "change-code" ->
-          Plant.change_code(plant, json["data"]["code"], json["data"]["workspace"])
+          Plant.change_code(plant, json["data"]["code"], json["data"]["workspace"], json["data"]["variables"])
           format_ok(req, state)
 
       "logged-in" ->

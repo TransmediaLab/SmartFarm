@@ -91,7 +91,8 @@ Blockly.Elixir.ORDER_NONE = 99;          // (...)
  * @param {!Blockly.Workspace} workspace Workspace to generate code from.
  */
 Blockly.Elixir.init = function(workspace) {
-  // Create a dictionary of definitions to be printed before the code.
+
+  // Create a dictionary of definitions .
   Blockly.Elixir.definitions_ = Object.create(null);
   // Create a dictionary mapping desired function names in definitions_
   // to actual function names (to avoid collisions with user functions).
@@ -104,31 +105,17 @@ Blockly.Elixir.init = function(workspace) {
     Blockly.Elixir.variableDB_.reset();
   }
 
-  var defvars = [];
-  var variables = Blockly.Variables.allVariables(workspace);
-  for (var x = 0; x < variables.length; x++) {
-    defvars[x] = 'var ' +
-        Blockly.Elixir.variableDB_.getName(variables[x],
-        Blockly.Variables.NAME_TYPE) + ';';
-  }
-  Blockly.Elixir.definitions_['variables'] = defvars.join('\n');
 };
 
 /**
  * Prepend the generated code with a command to seed the
  * random number generator.
- * Prepend the generated code with the variable definitions.
  * @param {string} code Generated code.
  * @return {string} Completed code.
  */
 Blockly.Elixir.finish = function(code) {
   code = ':random.seed(:os.timestamp)\n\n' + code;
-  // Convert the definitions dictionary into a list.
-  var definitions = [];
-  for (var name in Blockly.Elixir.definitions_) {
-    definitions.push(Blockly.Elixir.definitions_[name]);
-  }
-  return definitions.join('\n\n') + '\n\n\n' + code;
+  return code;
 };
 
 /**
@@ -138,7 +125,7 @@ Blockly.Elixir.finish = function(code) {
  * @return {string} Legal line of code.
  */
 Blockly.Elixir.scrubNakedValue = function(line) {
-  return line + ';\n';
+  return line + '\n';
 };
 
 /**

@@ -89,8 +89,10 @@ defmodule Database do
     by *id* loaded from the database
   """
   def plant(id) when is_integer(id) or is_binary(id) do
-    %Postgrex.Result{num_rows: 1, rows: [{id, user_id, name, description, code, workspace}]} = Postgrex.Connection.query!(:conn, "SELECT id, user_id, name, description, code, workspace FROM plants WHERE id = " <> to_string(id), [])
-    %{id: id, user_id: user_id, name: name, description: description, code: code, workspace: workspace}
+    %Postgrex.Result{num_rows: 1, rows: [{id, user_id, name, description, code, workspace, environment}]} = Postgrex.Connection.query!(:conn, "SELECT id, user_id, name, description, code, workspace, environment FROM plants WHERE id = " <> to_string(id), [])
+    {:ok, env_binary} = Base.decode32(environment)
+    env_term = :erlang.binary_to_term(env_binary) 
+    %{id: id, user_id: user_id, name: name, description: description, code: code, workspace: workspace, environment: env_term}
   end
 
   @doc """
@@ -98,7 +100,9 @@ defmodule Database do
     the Map *data*
   """
   def plant(nil, data) do
-    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO plants (user_id, name, description, code, workspace) VALUES (#{data.user_id}, '#{esc(data.name)}', '#{esc(data.description)}', '#{data.code}', '#{esc(data.workspace)}');", [])
+    env_binary = :erlang.term_to_binary(data.environment)
+    env_32 = Base.encode32(env_binary)
+    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "INSERT INTO plants (user_id, name, description, code, workspace, environment) VALUES (#{data.user_id}, '#{esc(data.name)}', '#{esc(data.description)}', '#{data.code}', '#{esc(data.workspace)}', E'#{env_32}');", [])
     %Postgrex.Result{rows: [{id}]} = Postgrex.Connection.query!(:conn, "SELECT currval(pg_get_serial_sequence('plants', 'id'));", [])
     id
   end
@@ -108,7 +112,9 @@ defmodule Database do
     the values contained in the Map *data*.  Returns the plant model's id.
   """
   def plant(id, data) do 
-    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "UPDATE plants SET name='#{esc(data.name)}', description='#{esc(data.description)}', code='#{esc(data.code)}', workspace='#{esc(data.workspace)}' WHERE id = #{id};", [])
+    env_binary = :erlang.term_to_binary(data.environment)
+    env_32 = Base.encode32(env_binary)
+    %Postgrex.Result{num_rows: 1} = Postgrex.Connection.query!(:conn, "UPDATE plants SET name='#{esc(data.name)}', description='#{esc(data.description)}', code='#{esc(data.code)}', workspace='#{esc(data.workspace)}', environment='#{esc(env_32)}' WHERE id = #{id};", [])
     id
   end
 

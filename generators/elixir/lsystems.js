@@ -31,25 +31,31 @@ goog.provide('Blockly.Elixir.lsystems');
 
 goog.require('Blockly.Elixir');
 
+/**
+  * List of illegal vairable names, specific to the Weather module
+  */
+Blockly.Elixir.addReservedWords(
+  "svg_path"
+);
+
 
 Blockly.Elixir['lsystems_draw'] = function(block) {
   // Draw an L-System using the supplied number of iterations,
   // angle, and distance
   var lsystem = Blockly.Elixir.valueToCode(block, 'LSYSTEM',
-        Blockly.Elixir.ORDER_ATOMIC) || '';
+        Blockly.Elixir.ORDER_ATOMIC) || '{:lsystem, <<"">>, []}';
   var count = Blockly.Elixir.valueToCode(block, 'TIMES', 
         Blockly.Elixir.ORDER_ATOMIC) || '0';
   var angle = Blockly.Elixir.valueToCode(block, 'ANGLE',
         Blockly.Elixir.ORDER_ATOMIC) || '0';
   var steps = Blockly.Elixir.valueToCode(block, 'DISTANCE',
         Blockly.Elixir.ORDER_ATOMIC) || '0';
-  var code = 'svg_path = LSystem.render(' + lsystem + ', ' + count + ', ' + angle + ', ' + steps + ')';
-  return [code, Blockly.Elixir.ORDER_ATOMIC];
+  return 'svg_path = LSystem.render(' + lsystem + ', ' + count + ', ' + angle + ', ' + steps + ')\n';
 };
 
 Blockly.Elixir['lsystems_create'] = function(block) {
   // Create a L-System with any number of production rules.
-  var axiom = block.getFieldValue('AXIOM') || '<<"">>';
+  var axiom = block.getFieldValue('AXIOM') || '';
   var code = new Array(block.itemCount_ + 1);
   for (var n = 0; n < block.itemCount_; n++) {
     code[n] = Blockly.Elixir.valueToCode(block, 'ADD' + n,
@@ -62,8 +68,8 @@ Blockly.Elixir['lsystems_create'] = function(block) {
 };
 
 Blockly.Elixir['lsystems_rule'] = function(block) {
-  var matchClause = block.getFieldValue('MATCH') || '<<0>>';
-  var yieldClause = block.getFieldValue('YIELD') || match;
+  var matchClause = block.getFieldValue('MATCH') || '0';
+  var yieldClause = block.getFieldValue('YIELD') || '0';
   var code = '<<"' + matchClause + '",tail::binary>> -> {<<"' + yieldClause + '">>,tail}';
-  return [code, Blockly.Elixir.ORDER_COMMA];
+  return [code, Blockly.Elixir.ORDER_ATOMIC];
 };
