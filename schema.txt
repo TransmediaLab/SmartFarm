@@ -27,8 +27,8 @@ CREATE TABLE plants (
   description TEXT,
   code TEXT,
   workspace TEXT,
-  search TSVECTOR,
-  deleted BOOLEAN DEFAULT false);
+  environment BYTEA DEFAULT '\x514e56413d3d3d3d',
+  search TSVECTOR,  deleted BOOLEAN DEFAULT false);
 
 CREATE TRIGGER plant_tsvector_udpate
   BEFORE INSERT OR UPDATE ON plants
