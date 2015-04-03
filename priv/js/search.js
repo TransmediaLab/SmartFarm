@@ -33,4 +33,14 @@ jQuery(function() {
     });
   }
 
+  $('.delete-button').on('click', function() {
+    target = $(this);
+    $.ajax( target.data('path'), {
+      method: 'DELETE',
+      success: function(data) {
+        target.parent().remove();
+      }
+    });
+  });
+
 });

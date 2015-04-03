@@ -1,4 +1,7 @@
 <div id=<%= id %> class="search-result">
+  <%= if show_delete do %> 
+    <button type="button" class="close delete-button" data-path="/farms/<%= id %>" aria-label="Delete"><span aria-hidden="true">&times;</span></button>
+  <% end %>
   <a class="title" href="/farms/<%= id %>"><%= name %></a>
   <a class="owner" href="/users/<%= user_id %>"><%= username %></a>
   <p class="description">

@@ -12,7 +12,8 @@ CREATE TABLE weather (
   description TEXT, 
   code TEXT, 
   workspace TEXT, 
-  search TSVECTOR);
+  search TSVECTOR,
+  deleted BOOLEAN DEFAULT false);
 
 CREATE TRIGGER weather_tsvector_update 
   BEFORE INSERT OR UPDATE ON weather 
@@ -26,7 +27,8 @@ CREATE TABLE plants (
   description TEXT,
   code TEXT,
   workspace TEXT,
-  search TSVECTOR);
+  search TSVECTOR,
+  deleted BOOLEAN DEFAULT false);
 
 CREATE TRIGGER plant_tsvector_udpate
   BEFORE INSERT OR UPDATE ON plants
@@ -42,7 +44,8 @@ CREATE TABLE farms (
   longitude FLOAT,
   fields TEXT,
   workspace TEXT,
-  search TSVECTOR);
+  search TSVECTOR,
+  deleted BOOLEAN DEFAULT false);
 
 CREATE TRIGGER farm_tsvector_udpate
   BEFORE INSERT OR UPDATE ON farms

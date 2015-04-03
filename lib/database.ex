@@ -57,15 +57,15 @@ defmodule Database do
 
 
   @doc """
-    Lists the plant models currently in the database
+    Lists the (undeleted) plant models currently in the database
   """
   def list_plants(last_id \\ 0) do
-    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT plants.id, plants.user_id, users.username, plants.name, plants.description FROM plants, users WHERE users.id = plants.user_id AND plants.id > #{last_id} ORDER BY plants.id LIMIT #{@rows_to_list};", [])
+    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT plants.id, plants.user_id, users.username, plants.name, plants.description FROM plants, users WHERE plants.deleted = false AND users.id = plants.user_id AND plants.id > #{last_id} ORDER BY plants.id LIMIT #{@rows_to_list};", [])
     rows
   end
 
   @doc """ 
-    Lists the plant models currently found in the database that satisfy the properties in *query*
+    Lists the (undeleted) plant models currently found in the database that satisfy the properties in *query*
   """
   def list_plants(query, last_id) do
     where = " AND plants.id > #{last_id} "
@@ -80,7 +80,7 @@ defmodule Database do
       where = where <> "AND plants.search @@ plainto_tsquery('#{terms}') "
     end
 
-    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT plants.id, plants.user_id, users.username, plants.name, plants.description FROM plants, users WHERE users.id = plants.user_id #{where} ORDER BY plants.id LIMIT #{@rows_to_list};", [])
+    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT plants.id, plants.user_id, users.username, plants.name, plants.description FROM plants, users WHERE plants.deleted = false AND users.id = plants.user_id #{where} ORDER BY plants.id LIMIT #{@rows_to_list};", [])
     rows
   end
 
@@ -118,17 +118,26 @@ defmodule Database do
     id
   end
 
+  @doc """
+    Sets the deleted flag for the plant specified to true.
+  """
+  def delete_plant(id) do
+    Postgrex.Connection.query!(:conn, "UPDATE plants SET deleted = true WHERE id=#{id};", [])
+    :ok
+  end
+
+
 
   @doc """
-    Lists the weather currently in the database
+    Lists the (undeleted) weather currently in the database
   """
   def list_weather(last_id \\ 0) do
-    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT weather.id, weather.user_id, users.username, weather.name, weather.description FROM weather, users WHERE users.id = weather.user_id AND weather.id > #{last_id} ORDER BY weather.id LIMIT #{@rows_to_list};", [])
+    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT weather.id, weather.user_id, users.username, weather.name, weather.description FROM weather, users WHERE weather.deleted = false AND users.id = weather.user_id AND weather.id > #{last_id} ORDER BY weather.id LIMIT #{@rows_to_list};", [])
     rows
   end
 
   @doc """ 
-    Lists the weather currently found in the database that satisfy the properties in *query*
+    Lists the (undeleted) weather currently found in the database that satisfy the properties in *query*
   """
   def list_weather(query, last_id) do
     where = " AND weather.id > #{last_id} "
@@ -143,7 +152,7 @@ defmodule Database do
       where = where <> "AND weather.search @@ plainto_tsquery('#{terms}') "
     end
 
-    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT weather.id, weather.user_id, users.username, weather.name, weather.description FROM weather, users WHERE users.id = weather.user_id #{where} ORDER BY weather.id LIMIT #{@rows_to_list};", [])
+    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT weather.id, weather.user_id, users.username, weather.name, weather.description FROM weather, users WHERE weather.deleted = false AND users.id = weather.user_id #{where} ORDER BY weather.id LIMIT #{@rows_to_list};", [])
     rows
   end
 
@@ -176,15 +185,24 @@ defmodule Database do
   end
 
   @doc """
-    Lists the farms currently found in the database
+    Sets the deleted flag for the weather specified to true.
+  """
+  def delete_weather(id) do
+    Postgrex.Connection.query!(:conn, "UPDATE weather SET deleted = true WHERE id=#{id};", [])
+    :ok
+  end
+
+
+  @doc """
+    Lists the (undeleted) farms currently found in the database
   """
   def list_farms(last_id \\ 0) when is_integer(last_id) or is_binary(last_id) do
-    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT farms.id, farms.user_id, users.username, farms.name, farms.description FROM farms, users WHERE users.id = farms.user_id AND farms.id > #{last_id} ORDER BY farms.id LIMIT #{@rows_to_list};", [])
+    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT farms.id, farms.user_id, users.username, farms.name, farms.description FROM farms, users WHERE farms.deleted = false AND users.id = farms.user_id AND farms.id > #{last_id} ORDER BY farms.id LIMIT #{@rows_to_list};", [])
     rows
   end
 
   @doc """ 
-    Lists the farms currently found in the database that satisfy the properties in *query*
+    Lists the (undeleted) farms currently found in the database that satisfy the properties in *query*
   """
   def list_farms(query, last_id) do
     where = " AND farms.id > #{last_id} "
@@ -199,7 +217,7 @@ defmodule Database do
       where = where <> "AND farms.search @@ plainto_tsquery('#{terms}') "
     end
 
-    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT farms.id, farms.user_id, users.username, farms.name, farms.description FROM farms, users WHERE users.id = farms.user_id #{where} ORDER BY farms.id LIMIT #{@rows_to_list};", [])
+    %Postgrex.Result{rows: rows} = Postgrex.Connection.query!(:conn, "SELECT farms.id, farms.user_id, users.username, farms.name, farms.description FROM farms, users WHERE farms.deleted = false AND users.id = farms.user_id #{where} ORDER BY farms.id LIMIT #{@rows_to_list};", [])
     rows
   end
 
@@ -227,11 +245,18 @@ defmodule Database do
     values contained in the Map *data*.  Returns the farm's id.
   """
   def farm(id, data) do
-IO.puts "Location: #{data.latitude}, #{data.longitude}"
-IO.puts "UPDATE farms SET name='#{esc(data.name)}', description='#{esc(data.description)}', latitude=#{data.latitude}, longitude=#{data.longitude}, fields='#{esc(data.fields)}' WHERE id = " <> to_string(id)
     Postgrex.Connection.query!(:conn, "UPDATE farms SET name='#{esc(data.name)}', description='#{esc(data.description)}', latitude=#{data.latitude}, longitude=#{data.longitude}, fields='#{esc(data.fields)}' WHERE id = " <> to_string(id), [])
     id
   end
+
+  @doc """
+    Sets the deleted flag for the farm specified to true.
+  """
+  def delete_farm(id) do
+    Postgrex.Connection.query!(:conn, "UPDATE farms SET deleted = true WHERE id=#{id};", [])
+    :ok
+  end
+
 
   # Generate a user_id snippet from a query string
   defp user_id_snippet(query) do
@@ -262,4 +287,5 @@ IO.puts "UPDATE farms SET name='#{esc(data.name)}', description='#{esc(data.desc
   end
 
 end
+
 

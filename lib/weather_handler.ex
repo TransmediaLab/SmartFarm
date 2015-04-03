@@ -9,7 +9,7 @@ defmodule WeatherHandler do
   # HTML page template functions
   EEx.function_from_file :defp, :weather_index, "priv/templates/weather/index.html.eex", [:models, :user_filters]
   EEx.function_from_file :defp, :weather_edit,  "priv/templates/weather/edit.html.eex",  []
-  EEx.function_from_file :defp, :weather_model, "priv/templates/weather/model.html.eex", [:id, :user_id, :username, :name, :description]
+  EEx.function_from_file :defp, :weather_model, "priv/templates/weather/model.html.eex", [:id, :user_id, :username, :name, :description, :show_delete]
   EEx.function_from_file :defp, :filter,	"priv/templates/search/user_filter.html.eex", [:user_id, :username]
 
   @doc """
@@ -31,7 +31,7 @@ defmodule WeatherHandler do
          if(xhr == "XMLHttpRequest") do
            {query, req} = :cowboy_req.qs_vals(req)
            reply = Database.list_weather(query, 0)
-             |> Enum.map(fn {id, user_id, username, name, desc} -> weather_model(id, user_id, username, name, desc) end)
+             |> Enum.map(fn {id, owner_id, username, name, desc} -> weather_model(id, owner_id, username, name, desc, to_string(owner_id) == to_string(user_id)) end)
            {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], reply, req
          else
            if user_id do
@@ -42,7 +42,7 @@ defmodule WeatherHandler do
              user_filters = nil
            end
            content = Database.list_weather
-             |> Enum.map(fn {id, user_id, username, name, desc} -> weather_model(id, user_id, username, name, desc) end)
+             |> Enum.map(fn {id, owner_id, username, name, desc} -> weather_model(id, owner_id, username, name, desc, to_string(owner_id) == to_string(user_id)) end)
              |> weather_index(user_filters)
            options = [
              title: <<"Weather Models">>,
@@ -53,15 +53,27 @@ defmodule WeatherHandler do
            {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.page(content, options), req
          end
       _ ->
-         content = weather_edit()
-         options = [
-           title: <<"Weather Model Editor">>,
-           controller: :weather,
-           user_id: user_id,
-           blockly: true,
-           scripts: ["/js/weather_editor.js"]
-         ]
-         {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.page(content, options), req        
+         {method, req} = :cowboy_req.method(req)
+         case method do
+           "GET" ->
+              content = weather_edit()
+              options = [
+                title: <<"Weather Model Editor">>,
+                controller: :weather,
+                user_id: user_id,
+                blockly: true,
+                scripts: ["/js/weather_editor.js"]
+              ]
+              {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.page(content, options), req        
+           "DELETE" ->
+              data = Database.weather(id)
+              if(to_string(user_id) == to_string(data.user_id)) do
+                Database.delete_weather(id)
+                {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], "", req
+              else
+                {:ok, req} = :cowboy_req.reply 401, [{"Content-Type", "text/html"}], "", req
+              end
+         end
     end
     {:ok, req, state}
   end
