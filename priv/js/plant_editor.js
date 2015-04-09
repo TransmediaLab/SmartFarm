@@ -212,15 +212,16 @@ jQuery(function() {
   }
 
   /* Set Plant values */
-  var svgNS = "http://www.w3.org/2000/svg";
-  var svgDoc = document.getElementById('plant-rendering');
-  var plants = document.createElementNS(svgNS, 'g');
-  svgDoc.appendChild(plants);
-
+  var draw = SVG('plant-rendering').size(480, 480).viewbox(-210, -400, 420, 420);
+  var ground = draw.rect(420, 20).x(-210).fill('#996633');
+  var seed = draw.circle(2).fill('green');
+  var plants = draw.group();
   function updatePlants(populationState) {
+    plants.clear();
     populationState.forEach( function(state) {
-      if(state.svg_path) plants.innerHTML = state.svg_path;
-      else plants.inner_html = "";
+      if(state.svg_path) state.svg_path.forEach( function(path) {
+        plants.path(path).stroke('green').fill('none');
+      });
     });
   }
 

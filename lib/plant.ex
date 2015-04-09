@@ -143,9 +143,6 @@ defmodule Plant do
     |> Enum.sum
   end
 
-  def to_svg() do
-  end
-
   @doc """
     Advances the modeled plant population by one day
   """

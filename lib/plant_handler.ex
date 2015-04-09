@@ -61,7 +61,7 @@ defmodule PlantHandler do
                 controller: :plants, 
                 user_id: user_id, 
                 blockly: :true,
-                scripts: ["/js/plant_editor.js"]
+                scripts: ["/js/svg.min.js", "/js/plant_editor.js"]
               ]
               content = plant_edit(id, Layout.controls(), Layout.blockly())
               {:ok, req} = :cowboy_req.reply 200, [{"Content-Type", "text/html"}], Layout.page(content, options), req

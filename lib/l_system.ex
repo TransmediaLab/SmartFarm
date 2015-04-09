@@ -57,7 +57,7 @@ defmodule LSystem do
 
     # Generate SVG snippet from the symbols
     {:point, x, y} = offset
-    renderSVG(symbols, <<>>, turtle(x: x, y: y, angle: angle, step: distance))
+    renderSVG(symbols, [], turtle(x: x, y: y, angle: angle, step: distance))
   end
 
 
@@ -79,15 +79,15 @@ defmodule LSystem do
 
   # Helper methods for carrying out turtle graphics with an L-System
 
-  def renderSVG(symbols, <<>>, state) do
-    renderSVG(symbols, <<"<path stroke=\"green\" fill=\"none\" d=\"M 0 0 ">>, state)
+  def renderSVG(symbols, [], state) do
+    renderSVG(symbols, [<<"M0,0">>], state)
   end
 
-  def renderSVG(<<>>, svg, state) do
-    svg = svg <> <<"\"/>">>
+  def renderSVG(<<>>, paths, state) do
+    paths
   end
 
-  def renderSVG(<<command::utf8, commands::binary>>, svg, state) do
+  def renderSVG(<<command::utf8, commands::binary>>, [path|paths], state) do
     case command do
       ?+ ->
         turtle(facing: facing, angle: angle) = state
@@ -100,16 +100,18 @@ defmodule LSystem do
         state = turtle(state, stack: [{x, y, facing} | stack])
       ?] ->
         turtle(stack: [{x,y,facing} | tail]) = state
-        svg = svg <> <<"\"/><path stroke=\"green\" fill=\"none\" d=\"M #{round(x)} #{round(-y)} ">>
+        paths = [path|paths]
+        path = <<"M#{round(x)},#{round(-y)}">>
         state = turtle(state, x: x, y: y, facing: facing, stack: tail)
       _ ->
         turtle(x: x, y: y, facing: facing, step: step) = state
         x = x + step * :math.cos(facing)
         y = y + step * :math.sin(facing) 
-        svg = svg <> <<"L #{round(x)} #{round(-y)} ">>
+        path = path <> <<"L#{round(x)},-#{round(y)}">>
         state = turtle(state, x: x, y: y) 
     end
-    renderSVG(commands, svg, state)
+    renderSVG(commands, [path|paths], state)
   end
 
 end
+
