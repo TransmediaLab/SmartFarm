@@ -48,3 +48,6 @@
   width: 80px;
   overflow: hidden;
 }
+#plant-rendering > svg {
+  border: 1px solid #ccc;
+}
